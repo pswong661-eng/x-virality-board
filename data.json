@@ -1,0 +1,67 @@
+{
+  "title": "Daily X narrative digest",
+  "date": null,
+  "timezone": "Asia/Vientiane",
+  "updated": null,
+  "brand_title": "Eric's X Virality Score",
+  "brand_handle": "@poh_sang62631",
+  "hits": [],
+  "virals": [],
+  "outsiders": [],
+  "patterns": [],
+  "no_hits": [],
+  "virals_narrative": "",
+  "narrative_synthesis": "",
+  "virals_window": "last ~48h",
+  "virals_target": 20,
+  "hits_count": 0,
+  "outsiders_count": 0,
+  "previous_day": {
+    "date": null,
+    "hits_count": 0,
+    "total_views": 0,
+    "x_score": 0
+  },
+  "leaderboards": {
+    "as_of": null,
+    "tracking_start": null,
+    "days_included": [],
+    "month_days_included": [],
+    "week": {
+      "label": "",
+      "range": [],
+      "entries": []
+    },
+    "month": {
+      "label": "",
+      "range": [],
+      "entries": []
+    }
+  },
+  "board_features": {
+    "count_up": true,
+    "live_pulse": true,
+    "theme_toggle": true,
+    "themes": [
+      "night",
+      "day"
+    ],
+    "grok_ambient": true,
+    "week_month_boards": true,
+    "day_roster_best_total": true,
+    "day_compare_chart": true,
+    "week_strip": true,
+    "no_hits_reasons": true,
+    "marker_class": "xvs-dash-2026"
+  },
+  "operator": {
+    "handle": "@poh_sang62631",
+    "name": "Eric Wong",
+    "profile_url": "https://x.com/poh_sang62631"
+  },
+  "ui": {
+    "default_theme": "night"
+  },
+  "day_roster": [],
+  "you_rank": null
+}

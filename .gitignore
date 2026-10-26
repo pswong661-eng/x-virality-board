@@ -1,0 +1,5 @@
+# data.json is tracked so GitHub Pages can serve the board.
+__pycache__/
+*.pyc
+leaderboard_ledger.json
+digests/
