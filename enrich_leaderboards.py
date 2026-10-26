@@ -12,6 +12,7 @@ personal operator handle or a private digest path.
 - Does NOT double-count: re-running overwrites that day's ledger slice
 - Only patches leaderboards (+ updated); leaves day_roster / hits / etc. intact
 - Does not invent historical "you" views when a day's scrape is missing
+- Does not invent tracking_start or data.date when no digest exists
 
 Paths:
   XVS_DATA           default: <this dir>/data.json
@@ -20,7 +21,9 @@ Paths:
   XVS_DIGEST_ROOT    default: <repo>/digests
                      each day is YYYY-MM-DD/composed.json or watchlist_merged.json
                      optional YYYY-MM-DD/_parts/you_day.json for the operator
-  XVS_TRACKING_START ISO date; else leaderboards.tracking_start or data.date
+                     a missing digests directory is an empty run, not an error
+  XVS_TRACKING_START ISO date; else leaderboards.tracking_start or data.date.
+                     If those are unset, the earliest digest day on disk.
   XVS_TIMEZONE       else watchlist timezone or data.timezone (default UTC)
   XVS_MIN_VIEWS      else watchlist min_views (default 5000)
 
@@ -39,6 +42,7 @@ import os
 from collections import defaultdict
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 # Starter keeps this file in board/ (repo root is the parent). This Pages
@@ -66,6 +70,13 @@ THRESHOLD = 5000
 TRACKING_START = ""
 TZ_NAME = "UTC"
 MSK = timezone.utc
+
+
+def _present(value: object) -> str | None:
+    if value is None:
+        return None
+    text = str(value).strip()
+    return text or None
 
 
 def configure() -> None:
@@ -102,19 +113,20 @@ def configure() -> None:
         or "UTC"
     )
     try:
-        from zoneinfo import ZoneInfo
-
         MSK = ZoneInfo(TZ_NAME)
     except Exception:
         MSK = timezone.utc
 
     boards = data.get("leaderboards") or {}
-    TRACKING_START = str(
-        os.environ.get("XVS_TRACKING_START")
-        or boards.get("tracking_start")
-        or data.get("date")
-        or datetime.now(MSK).date().isoformat()
+    explicit_start = (
+        _present(os.environ.get("XVS_TRACKING_START"))
+        or _present(boards.get("tracking_start"))
+        or _present(data.get("date"))
     )
+    # A blank board has no floor yet. Inventing "today" drops every earlier
+    # scrape, including the first --as-of digest, and then gets written back
+    # into data.date.
+    TRACKING_START = explicit_start or earliest_digest_day() or ""
 
 
 def norm_handle(h: str) -> str:
@@ -163,6 +175,13 @@ def day_has_digest(day: str) -> bool:
 
 
 def list_digest_days(start: str, end: str | None = None) -> list[str]:
+    """Digest days in [start, end]. A blank start applies no floor.
+
+    digests/ is gitignored and absent after clone. Treat that as no days
+    instead of raising FileNotFoundError on the first refresh.
+    """
+    if not ROOT.is_dir():
+        return []
     days = []
     for p in sorted(ROOT.iterdir()):
         if not p.is_dir():
@@ -174,13 +193,32 @@ def list_digest_days(start: str, end: str | None = None) -> list[str]:
             parse_day(name)
         except ValueError:
             continue
-        if name < start:
+        if start and name < start:
             continue
         if end and name > end:
             continue
         if day_has_digest(name):
             days.append(name)
     return days
+
+
+def earliest_digest_day() -> str | None:
+    days = list_digest_days("")
+    return days[0] if days else None
+
+
+def latest_digest_day(end: str | None = None) -> str | None:
+    days = list_digest_days(TRACKING_START or "", end)
+    return days[-1] if days else None
+
+
+def read_data_date() -> str | None:
+    if not DASH.exists():
+        return None
+    try:
+        return _present(json.loads(DASH.read_text()).get("date"))
+    except Exception:
+        return None
 
 
 def you_posts_ge5k(day: str) -> list[dict]:
@@ -259,7 +297,7 @@ def build_day_slice(day: str) -> dict[str, dict]:
 
 def empty_ledger() -> dict:
     return {
-        "tracking_start": TRACKING_START,
+        "tracking_start": TRACKING_START or None,
         "timezone": TZ_NAME,
         "threshold": THRESHOLD,
         "days": {},
@@ -273,7 +311,7 @@ def load_ledger() -> dict:
 
 
 def save_ledger(ledger: dict) -> None:
-    ledger["tracking_start"] = TRACKING_START
+    ledger["tracking_start"] = TRACKING_START or None
     ledger["timezone"] = TZ_NAME
     ledger["threshold"] = THRESHOLD
     LEDGER.write_text(json.dumps(ledger, ensure_ascii=False, indent=2) + "\n")
@@ -291,36 +329,39 @@ def upsert_day(ledger: dict, day: str) -> None:
 
 def bootstrap_ledger(end: str | None = None) -> dict:
     ledger = empty_ledger()
-    for day in list_digest_days(TRACKING_START, end):
+    for day in list_digest_days(TRACKING_START or "", end):
         upsert_day(ledger, day)
-    save_ledger(ledger)
+    # A first run with no scrapes must not create a ledger. The next run
+    # would see that file, skip bootstrap, and keep only the latest day.
+    if ledger["days"] or LEDGER.exists():
+        save_ledger(ledger)
     return ledger
 
 
-def resolve_as_of(requested: str | None, ledger: dict) -> str:
-    """as_of = requested digest day if present in ledger/disk; else latest ledger day;
-    else data.json date; never invent a day without digest."""
-    days = sorted(ledger.get("days", {}).keys())
+def resolve_as_of(requested: str | None, ledger: dict) -> str | None:
+    """A day with a digest file or a ledger slice.
+
+    data.date is used only when that day itself has a digest or a slice.
+    A bare date is not a scored day: returning it creates an empty ledger
+    and rebuilds the published week and month boards from no slices.
+    """
+    ledger_days = ledger.get("days") or {}
+    days = sorted(ledger_days)
     latest_ledger = days[-1] if days else None
-    data_date = None
-    if DASH.exists():
-        try:
-            data_date = json.loads(DASH.read_text()).get("date")
-        except Exception:
-            pass
+    today = datetime.now(MSK).date().isoformat()
+
+    def backed(day: str | None) -> str | None:
+        if day and (day_has_digest(day) or day in ledger_days):
+            return day
+        return None
 
     if requested:
-        if day_has_digest(requested) or requested in (ledger.get("days") or {}):
-            return requested
-        # requested today with no digest — fall back
-        return latest_ledger or data_date or TRACKING_START
+        chosen = backed(requested)
+        if chosen:
+            return chosen
+        return latest_ledger or backed(read_data_date()) or latest_digest_day(today)
 
-    # default: latest digest on disk ≤ today, else latest ledger
-    today = datetime.now(MSK).date().isoformat()
-    digest_days = list_digest_days(TRACKING_START, today)
-    if digest_days:
-        return digest_days[-1]
-    return latest_ledger or data_date or TRACKING_START
+    return latest_digest_day(today) or latest_ledger or backed(read_data_date())
 
 
 def week_day_list(as_of: str, tracking_start: str) -> list[str]:
@@ -423,7 +464,7 @@ def patch_data_json(as_of: str, ledger: dict) -> dict:
             f"missing {DASH}. Place data.json next to this script first."
         )
     data = json.loads(DASH.read_text())
-    tracking_start = ledger.get("tracking_start") or TRACKING_START
+    tracking_start = ledger.get("tracking_start") or TRACKING_START or as_of
     ledger_days = sorted(ledger.get("days", {}).keys())
 
     week_days = week_day_list(as_of, tracking_start)
@@ -458,10 +499,8 @@ def patch_data_json(as_of: str, ledger: dict) -> dict:
         },
     }
     data["updated"] = datetime.now(MSK).replace(microsecond=0).isoformat()
-    # Keep data.date as the digest day we are scoring (do not invent Sep 24)
+    # data.date is the digest day being scored. Leave a blank board null.
     if day_has_digest(as_of):
-        data["date"] = as_of
-    elif not data.get("date"):
         data["date"] = as_of
 
     DASH.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n")
@@ -491,15 +530,23 @@ def main() -> None:
         ledger = load_ledger()
 
     as_of = resolve_as_of(args.as_of, ledger)
+    if not as_of:
+        print("no digest days; left data.json date and tracking_start unchanged")
+        return
 
     if not args.no_upsert:
         if day_has_digest(as_of):
             upsert_day(ledger, as_of)
             save_ledger(ledger)
             print(f"upserted day={as_of} accounts={len(ledger['days'][as_of]['accounts'])}")
-        else:
+        elif ledger.get("days") or LEDGER.exists():
             print(f"no digest for as_of={as_of}; ledger unchanged for that day")
             save_ledger(ledger)
+        else:
+            # No slice and no file yet. Saving here would create the empty
+            # ledger that makes the next scrape skip bootstrap.
+            print("no digest days; left data.json date and tracking_start unchanged")
+            return
 
     data = patch_data_json(as_of, ledger)
     lbs = data["leaderboards"]

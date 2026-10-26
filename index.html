@@ -842,6 +842,7 @@ function renderYourDay(youRank, handle){
   });
 }
 function normalizeNoHits(raw){
+  if(raw==null) return null;
   if(!Array.isArray(raw)) return [];
   return raw.map(item=>{
     if(typeof item==='string') return {handle:item.startsWith('@')?item:'@'+item, reason:'Below 5k views floor or no qualifying day original.', max_views:null};
@@ -855,6 +856,7 @@ function normalizeNoHits(raw){
 }
 function renderNoHits(list){
   const el=document.getElementById('nohits');
+  if(list==null){el.innerHTML='<p class="muted">No scrape yet. Accounts under the 5k floor will be listed after the first digest.</p>';return}
   if(!list.length){el.innerHTML='<p class="muted">All watchlist accounts cleared the 5k floor today.</p>';return}
   const sorted=[...list].sort((a,b)=>{
     const av=a.max_views==null?-1:num(a.max_views);
@@ -879,7 +881,7 @@ async function boot(){
   const hits=Array.isArray(d.hits)?d.hits:[];const virals=Array.isArray(d.virals)?d.virals:(Array.isArray(d.outsiders)?d.outsiders:[]);
   const totalViews=hits.reduce((a,h)=>a+num(h.views),0);const maxViews=hits.length?Math.max(...hits.map(h=>num(h.views))):0;const highlights=hits.filter(h=>h.highlight===true||num(h.views)>=DASHBOARD_TARGETS.starViews).length;
   const score=scoreFor(hits.length,totalViews);let delta=rawIndex(hits.length,totalViews)-100,label='vs target';
-  const prev=d.previous_day||d.previous||null;if(prev){let ps=Number(prev.x_score);if(!Number.isFinite(ps)){const ph=Array.isArray(prev.hits)?prev.hits.length:num(prev.hits_count);const pv=Array.isArray(prev.hits)?prev.hits.reduce((a,h)=>a+num(h.views),0):num(prev.total_views);ps=scoreFor(ph,pv)}if(Number.isFinite(ps)){delta=score-ps;label='vs prev day'}}
+  const prevRaw=d.previous_day||d.previous||null;const prev=prevRaw&&prevRaw.date?prevRaw:null;if(prev){let ps=Number(prev.x_score);if(!Number.isFinite(ps)){const ph=Array.isArray(prev.hits)?prev.hits.length:num(prev.hits_count);const pv=Array.isArray(prev.hits)?prev.hits.reduce((a,h)=>a+num(h.views),0):num(prev.total_views);ps=scoreFor(ph,pv)}if(Number.isFinite(ps)){delta=score-ps;label='vs prev day'}}
   countUp(document.getElementById('x-score'), score, {duration:1200, format:v=>String(Math.round(v))});
   const ring=document.getElementById('score-ring');
   const reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
