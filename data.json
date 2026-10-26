@@ -9,19 +9,14 @@
   "virals": [],
   "outsiders": [],
   "patterns": [],
-  "no_hits": [],
+  "no_hits": null,
   "virals_narrative": "",
   "narrative_synthesis": "",
   "virals_window": "last ~48h",
   "virals_target": 20,
   "hits_count": 0,
   "outsiders_count": 0,
-  "previous_day": {
-    "date": null,
-    "hits_count": 0,
-    "total_views": 0,
-    "x_score": 0
-  },
+  "previous_day": null,
   "leaderboards": {
     "as_of": null,
     "tracking_start": null,
