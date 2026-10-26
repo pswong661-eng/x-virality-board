@@ -339,19 +339,29 @@ def bootstrap_ledger(end: str | None = None) -> dict:
 
 
 def resolve_as_of(requested: str | None, ledger: dict) -> str | None:
-    """Requested digest day, else latest ledger day, else data.json date,
-    else latest digest on disk. Never invent a calendar day with no digest."""
-    days = sorted((ledger.get("days") or {}).keys())
+    """A day with a digest file or a ledger slice.
+
+    data.date is used only when that day itself has a digest or a slice.
+    A bare date is not a scored day: returning it creates an empty ledger
+    and rebuilds the published week and month boards from no slices.
+    """
+    ledger_days = ledger.get("days") or {}
+    days = sorted(ledger_days)
     latest_ledger = days[-1] if days else None
-    data_date = read_data_date()
     today = datetime.now(MSK).date().isoformat()
 
-    if requested:
-        if day_has_digest(requested) or requested in (ledger.get("days") or {}):
-            return requested
-        return latest_ledger or data_date or latest_digest_day(today)
+    def backed(day: str | None) -> str | None:
+        if day and (day_has_digest(day) or day in ledger_days):
+            return day
+        return None
 
-    return latest_digest_day(today) or latest_ledger or data_date
+    if requested:
+        chosen = backed(requested)
+        if chosen:
+            return chosen
+        return latest_ledger or backed(read_data_date()) or latest_digest_day(today)
+
+    return latest_digest_day(today) or latest_ledger or backed(read_data_date())
 
 
 def week_day_list(as_of: str, tracking_start: str) -> list[str]:
@@ -529,9 +539,14 @@ def main() -> None:
             upsert_day(ledger, as_of)
             save_ledger(ledger)
             print(f"upserted day={as_of} accounts={len(ledger['days'][as_of]['accounts'])}")
-        else:
+        elif ledger.get("days") or LEDGER.exists():
             print(f"no digest for as_of={as_of}; ledger unchanged for that day")
             save_ledger(ledger)
+        else:
+            # No slice and no file yet. Saving here would create the empty
+            # ledger that makes the next scrape skip bootstrap.
+            print("no digest days; left data.json date and tracking_start unchanged")
+            return
 
     data = patch_data_json(as_of, ledger)
     lbs = data["leaderboards"]

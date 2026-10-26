@@ -205,6 +205,120 @@ class EnrichLeaderboardTests(unittest.TestCase):
         self.assertEqual(week["@today"]["views"], 7000)
         self.assertNotIn("@yesterday", week)
 
+    def test_date_without_digest_does_not_create_empty_ledger(self) -> None:
+        today = self.script_today()
+        stale = self.day_before(today, 5)
+        earlier = self.day_before(today, 2)
+        later = self.day_before(today, 1)
+        data = self.load_data()
+        data["date"] = stale
+        data["leaderboards"]["week"]["entries"] = [
+            {
+                "handle": "@cached",
+                "name": "Cached",
+                "hits": 2,
+                "days": 1,
+                "views": 12000,
+                "best": 8000,
+                "best_url": "",
+            }
+        ]
+        self.data_path.write_text(
+            json.dumps(data, ensure_ascii=False, indent=2) + "\n",
+            encoding="utf-8",
+        )
+        self.digests.mkdir()
+        pinned = self.data_path.read_bytes()
+
+        result = self.run_cli()
+        self.assertIn("no digest days", result.stdout)
+        self.assertNotIn("no digest for as_of", result.stdout)
+        self.assertFalse(self.ledger_path.exists())
+        self.assertEqual(self.data_path.read_bytes(), pinned)
+
+        self.add_digest(earlier, account("@early", 6000))
+        self.add_digest(later, account("@later", 8000))
+        self.run_cli()
+        scored = self.load_data()
+        week = {row["handle"]: row for row in scored["leaderboards"]["week"]["entries"]}
+        self.assertEqual(set(self.load_ledger()["days"]), {earlier, later})
+        self.assertEqual(week["@early"]["views"], 6000)
+        self.assertEqual(week["@later"]["views"], 8000)
+
+    def test_missing_digests_keep_cached_leaderboards(self) -> None:
+        today = self.script_today()
+        stale = self.day_before(today, 4)
+        data = self.load_data()
+        data["date"] = stale
+        data["leaderboards"]["as_of"] = stale
+        data["leaderboards"]["week"]["entries"] = [
+            {
+                "handle": "@cached",
+                "name": "Cached",
+                "hits": 2,
+                "days": 1,
+                "views": 12000,
+                "best": 8000,
+                "best_url": "",
+            }
+        ]
+        data["leaderboards"]["month"]["entries"] = [
+            {
+                "handle": "@cached",
+                "name": "Cached",
+                "hits": 4,
+                "days": 3,
+                "views": 34000,
+                "best": 9000,
+                "best_url": "",
+            }
+        ]
+        self.data_path.write_text(
+            json.dumps(data, ensure_ascii=False, indent=2) + "\n",
+            encoding="utf-8",
+        )
+        pinned = self.data_path.read_bytes()
+        self.assertFalse(self.digests.exists())
+
+        result = self.run_cli()
+        self.assertIn("no digest days", result.stdout)
+        self.assertFalse(self.ledger_path.exists())
+        self.assertEqual(self.data_path.read_bytes(), pinned)
+
+        missed = self.run_cli("--as-of", self.day_before(today, 1))
+        self.assertIn("no digest days", missed.stdout)
+        self.assertFalse(self.ledger_path.exists())
+        self.assertEqual(self.data_path.read_bytes(), pinned)
+        kept = self.load_data()
+        self.assertEqual(kept["date"], stale)
+        self.assertEqual(kept["leaderboards"]["week"]["entries"][0]["views"], 12000)
+        self.assertEqual(kept["leaderboards"]["month"]["entries"][0]["views"], 34000)
+
+    def test_tracking_start_without_digests_also_skips_the_ledger(self) -> None:
+        data = self.load_data()
+        data["leaderboards"]["tracking_start"] = self.day_before(self.script_today(), 5)
+        data["leaderboards"]["week"]["entries"] = [
+            {
+                "handle": "@cached",
+                "name": "Cached",
+                "hits": 2,
+                "days": 1,
+                "views": 12000,
+                "best": 8000,
+                "best_url": "",
+            }
+        ]
+        self.data_path.write_text(
+            json.dumps(data, ensure_ascii=False, indent=2) + "\n",
+            encoding="utf-8",
+        )
+        pinned = self.data_path.read_bytes()
+
+        result = self.run_cli()
+        self.assertIn("no digest days", result.stdout)
+        self.assertFalse(self.ledger_path.exists())
+        self.assertEqual(self.data_path.read_bytes(), pinned)
+
 
 if __name__ == "__main__":
     unittest.main()
