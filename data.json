@@ -1340,5 +1340,121 @@
       "stale": true
     }
   ],
-  "you_rank": null
+  "you_rank": null,
+  "scorecard": {
+    "updated": "2026-10-31",
+    "panels": [
+      {
+        "platform": "X",
+        "handle": "@pswong661",
+        "baseline": {
+          "date": "2026-10-31",
+          "followers": 15,
+          "following": 75,
+          "posts": 220
+        },
+        "targets_status": "Estimates (not yet approved)",
+        "targets": [
+          [
+            "Followers by 30 Nov",
+            "50-150"
+          ],
+          [
+            "Followers by 31 Jan",
+            "300-800"
+          ],
+          [
+            "Followers by 30 Apr",
+            "1k-3k"
+          ],
+          [
+            "Engagement rate",
+            "3%+ of views"
+          ]
+        ]
+      },
+      {
+        "platform": "X",
+        "handle": "@poh_sang62631",
+        "baseline": {
+          "date": "2026-10-31",
+          "followers": 6,
+          "following": 22,
+          "posts": 90
+        },
+        "targets_status": "Approved by Eric, 31 Oct",
+        "targets": [
+          [
+            "Followers",
+            "25 by 30 Nov, 75 by 31 Dec, 200 by 31 Mar 2027"
+          ],
+          [
+            "Originals",
+            "5+/week, 1 in 3 with media"
+          ],
+          [
+            "Median views per original",
+            "100 by 30 Nov, 250 by 31 Dec"
+          ],
+          [
+            "Engagement rate",
+            "2%+"
+          ],
+          [
+            "indochina.ai clicks",
+            "10+/week by 31 Dec"
+          ],
+          [
+            "Replies",
+            "15+/week"
+          ]
+        ]
+      },
+      {
+        "platform": "Instagram",
+        "handle": "@ericio0007",
+        "baseline": {
+          "date": "2026-10-31",
+          "followers": 196,
+          "following": 81,
+          "posts": 16
+        },
+        "targets_status": "Set by Eric, 31 Oct",
+        "targets": [
+          [
+            "Followers",
+            "230 by 30 Nov, 300 by 31 Dec, 500 by 31 Mar 2027"
+          ],
+          [
+            "Cadence",
+            "3 posts/week, 1+ Reel/week"
+          ],
+          [
+            "Avg reach per post",
+            "300 by 30 Nov, 600 by 31 Dec"
+          ],
+          [
+            "Engagement rate",
+            "5%+ (likes+comments+saves / reach)"
+          ],
+          [
+            "Saves per post",
+            "5+ by 31 Dec"
+          ],
+          [
+            "Profile visits",
+            "tracked weekly"
+          ]
+        ],
+        "theme": "Premium wellness feeling: calm, elegant AKEMI imagery, Lao-first captions, never salesy. Every post needs Eric's yes.",
+        "note": "Reach, saves and profile visits need Instagram insights (professional account); if unavailable, track likes and comments only.",
+        "context": {
+          "label": "Instagram users in Laos",
+          "value": "599,000 (late 2025, 7.6% of population, Meta ad reach)",
+          "source": "https://datareportal.com/reports/digital-2026-laos",
+          "source_label": "DataReportal Digital 2026: Laos"
+        }
+      }
+    ]
+  }
 }

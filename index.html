@@ -381,6 +381,17 @@ footer{margin-top:52px;padding-top:22px;border-top:1px solid var(--line);color:v
 .week-day.on{border-color:var(--cyan);color:var(--cyan);background:var(--cyan-dim)}
 .week-day .wd-d{display:block;font-size:11px;color:var(--text);margin-top:3px;letter-spacing:0}
 
+.scorecard{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:8px}
+.sc-panel{padding:20px 22px;display:flex;flex-direction:column;gap:12px}
+.sc-handle{font-size:18px;font-weight:700;letter-spacing:-.02em}
+.sc-base{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.sc-base div{background:var(--stat-bg);border:1px solid var(--line);border-radius:var(--radius-sm);padding:8px 10px}
+.sc-base b{display:block;font-size:18px}
+.sc-base span,.sc-row span,.sc-note{font:500 11px "IBM Plex Mono",monospace;color:var(--muted)}
+.sc-status{font:600 11px "IBM Plex Mono",monospace;color:var(--cyan)}
+.sc-row{display:flex;flex-direction:column;gap:2px;padding:7px 0;border-top:1px solid var(--line);font-size:13px}
+.sc-note a{color:var(--cyan)}
+@media(max-width:980px){.scorecard{grid-template-columns:1fr}}
 @media(max-width:980px){
   .hero,.charts-row{grid-template-columns:1fr}
   .stats{grid-template-columns:repeat(3,1fr)}
@@ -585,6 +596,11 @@ footer{margin-top:52px;padding-top:22px;border-top:1px solid var(--line);color:v
     </section>
 
     <section class="stats" id="stats" aria-label="Daily metrics"></section>
+
+    <div id="scorecard-wrap" hidden>
+    <div class="section-head"><div><div class="section-index">scorecard / growth targets</div><h2>Scorecard</h2></div><div class="section-note" id="scorecard-note">baseline 31 Oct 2026</div></div>
+    <section class="scorecard" id="scorecard" aria-label="Account scorecard"></section>
+    </div>
 
     <div class="section-head reveal"><div><div class="section-index">03 / you vs watchlist</div><h2>Daily rank</h2></div><div class="section-note" id="roster-note">best / total · ranked by best</div></div>
     <section class="panel roster-panel reveal" aria-label="You versus watchlist">
@@ -937,6 +953,15 @@ async function boot(){
   staggerCards('#virals .card');
   const narr=document.getElementById('virals-narrative');if(d.virals_narrative||d.narrative_synthesis){narr.hidden=false;narr.textContent=d.virals_narrative||d.narrative_synthesis}
   renderNoHits(normalizeNoHits(d.no_hits));
+  try{renderScorecard(d.scorecard)}catch(e){console.error(e)}
+}
+function renderScorecard(sc){
+  const wrap=document.getElementById('scorecard-wrap');if(!wrap)return;
+  const panels=sc&&Array.isArray(sc.panels)?sc.panels:[];if(!panels.length){wrap.hidden=true;return}
+  document.getElementById('scorecard').innerHTML=panels.map(p=>{const b=p.baseline||{};const c=p.context;
+    return `<article class="panel sc-panel"><div class="panel-label"><strong>${esc(p.platform||'')} /</strong> baseline ${esc(b.date||'')}</div><div class="sc-handle">${esc(p.handle||'')}</div><div class="sc-base"><div><b>${esc(b.followers??'—')}</b><span>followers</span></div><div><b>${esc(b.following??'—')}</b><span>following</span></div><div><b>${esc(b.posts??'—')}</b><span>posts</span></div></div><div class="sc-status">${esc(p.targets_status||'')}</div><div>${(p.targets||[]).map(t=>`<div class="sc-row"><span>${esc(t[0])}</span>${esc(t[1])}</div>`).join('')}</div>${p.theme?`<div class="sc-note">${esc(p.theme)}</div>`:''}${p.note?`<div class="sc-note">${esc(p.note)}</div>`:''}${c?`<div class="sc-note">${esc(c.label)}: <b style="color:var(--text)">${esc(c.value)}</b> · <a href="${esc(c.source)}" target="_blank" rel="noopener">${esc(c.source_label||'source')} ↗</a></div>`:''}</article>`}).join('');
+  if(sc.updated)document.getElementById('scorecard-note').textContent='updated '+sc.updated;
+  wrap.hidden=false;
 }
 initTheme();
 boot().catch(err=>{document.getElementById('meta').textContent='failed to load data.json';console.error(err)});
