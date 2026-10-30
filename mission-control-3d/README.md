@@ -1,6 +1,6 @@
 # Mission Control 3D
 
-A dark, static 3D office for Eric's bot fleet. Open `index.html`. Each bot in `DATA` is a figure at its own desk. The panels read the same object: who is waiting on Eric, recent activity, routines, and the hourly activity grid.
+A night-time 3D floor of Mission Control for Eric's bot fleet. Open `index.html`. Each bot in `DATA` is a holo figure on a high floor of a glass tower, with the city outside. The panels read the same object: who is waiting on Eric, recent activity, routines, and the hourly activity grid.
 
 Nothing here is sample data. If a list is missing or empty, the panel says `no data` (a missing count shows `—`). An empty `bots` array leaves the floor empty.
 
@@ -16,7 +16,9 @@ Then open http://127.0.0.1:8765/mission-control-3d/
 
 You can also open `mission-control-3d/index.html` directly. `data.js` and `vendor/three.min.js` are classic scripts, so a file URL works. Three.js r160.1 (MIT) is vendored; the page does not call other services.
 
-Drag to orbit, scroll or pinch to zoom, click a station or a list row for that bot's fields. Arrow keys orbit when focus is not on a button. Escape clears the selection. On a narrow screen the panels sit behind Waiting, Activity, Routines, and Fleet.
+Drag to orbit, scroll or pinch to zoom, click a bot or a list row for that bot's fields. The view keeps turning slowly until you drag, scroll, or use the arrow keys. Arrow keys orbit when focus is not on a button. Escape clears the selection. On a narrow screen the panels sit behind Waiting, Activity, Routines, and Fleet.
+
+**Glow: high** on the header card adds a soft bloom over the neon and screens. **Glow: low** skips that pass and draws fewer pixels, for a laptop that is struggling. The choice is remembered in this browser.
 
 ## How the refresh updates `data.js`
 
@@ -57,7 +59,7 @@ Same fields the current block uses. Missing keys are shown as empty, not filled 
 | --- | --- |
 | `generatedAt` | Clock on the stat card and the wall. Also the reference time for lamp brightness. |
 | `windowNote` | The "Window note" disclosure. Empty becomes "Window note: no data". |
-| `bots[]` | One desk each. `id`, `name`, `lastSeen`, `now`. |
+| `bots[]` | One figure each. `id`, `name`, `lastSeen`, `now`. |
 | `waiting[]` | Count on the stat card, the waiting list, and the wall number. `bot` is a bot id. `at`, `text`, `source`. |
 | `timeline[]` | Recent activity. `bot`, `at`, `text`. |
 | `routines[]` | Upcoming runs. `bot`, `name`, `cron`, `next`. |
@@ -65,16 +67,19 @@ Same fields the current block uses. Missing keys are shown as empty, not filled 
 | `routinesNotVisible[]` | Names with no visible schedule. |
 | `heatmap` | `days` plus `values` (one row per day). A row of 24 numbers is drawn as hours 0–23. |
 
-`waiting[].bot`, `timeline[].bot`, `routines[].bot`, and `observedRoutines[].bot` match `bots[].id`. An id with no station still appears in the list; the detail card says no station matches.
+`waiting[].bot`, `timeline[].bot`, `routines[].bot`, and `observedRoutines[].bot` match `bots[].id`. An id with no figure still appears in the list; the detail card says no bot matches.
 
 `lastSeen` values with no timezone use the offset on `generatedAt` (`+07:00` in the current file). If `generatedAt` has no offset, those stamps are read as UTC.
 
-### Lamps and typing
+### Bots, glow, and the picture
 
 This is display only. It does not add status text.
 
-- `now` is non-empty: the figure types and the screen stays bright.
-- Otherwise the lamp follows `lastSeen` minus `generatedAt`: bright within 12 hours, dim within 48 hours, dark after that.
+- `now` is non-empty: the bot sits at its desk and types. The screen stays bright, and a holo bubble shows that `now` text.
+- Otherwise the bot idles. A stable mix, from the bot id, either bobs in place, looks around, or walks a short loop on the aisle and returns to the desk. Reduced motion keeps every bot still.
+- Glow uses `lastSeen` against `generatedAt`, unless `now` is set (that figure is bright and typing). Bright within 12 hours, dim within 48 hours, dark after that.
 - A blank or unparseable `lastSeen`, with no `now`, stays dark.
 
-Bot accent colors are a stable hash of `id` so neighboring desks are easier to tell apart. They are not a field in `DATA`.
+Bot accent colors are a stable hash of `id` so neighbors are easier to tell apart. They are not a field in `DATA`.
+
+The room is the high floor of a glass tower at night: floor-to-ceiling windows, a lit skyline, a few moving drones and street lights, light fog, and stars. Neon floor lines, emissive screens, and rim light are drawn either way. Bloom is the part the Glow button turns off.
