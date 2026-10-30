@@ -1,7 +1,30 @@
-/* Mission Control office. Reads the global DATA object from data.js. */
+/* Mission Control office. loader.js fetches data.json into the global DATA object, then loads this file. */
 
 (function () {
   "use strict";
+
+  // Floor zones. Edit this object to move a bot: matching is case-insensitive
+  // against bots[].name. "Reed" also matches a name that starts with "Reed/".
+  // The first zone that lists a name wins. Names that match nothing use defaultZone.
+  // There is no business field in data.json; this map is the whole assignment.
+  // Shelf sits with AKEMI because that is the only list that names Shelf.
+  // VILLA VISOUN stays empty until a name is added here.
+  var OFFICE = {
+    executive: {
+      label: "EXECUTIVE OFFICE",
+      role: "CoS",
+      color: "#ff4f9a",
+      names: ["Al Capone"],
+    },
+    zones: [
+      { id: "akemi", label: "AKEMI", color: "#ffb15a", names: ["Kham", "Tally", "Mattie", "Anchor", "Shelf"] },
+      { id: "pann", label: "PANN AI", color: "#ff5ec8", names: ["Reed", "Reed/PannaiGrok"] },
+      { id: "villa", label: "VILLA VISOUN", color: "#f0d48a", names: [] },
+      { id: "personal", label: "PERSONAL", color: "#b388ff", names: ["Sage", "Voss", "Deedkeeper", "Compass"] },
+      { id: "fleet", label: "FLEET OPS", color: "#3ee0ff", names: ["Forge", "Proof", "Kit", "X Virality Score", "Rapid Response Desk", "Answering Machina"] },
+    ],
+    defaultZone: { id: "unassigned", label: "UNASSIGNED", color: "#9eb4c4" },
+  };
 
   var RECENT_HOURS = 12;
   var QUIET_HOURS = 48;
@@ -27,6 +50,11 @@
     timeOffset: 0,
     animTime: 0,
     holdTime: null,
+    tourOn: false,
+    tourTime: 0,
+    dataPacked: "",
+    pulling: false,
+    officeLayout: null,
   };
 
   var pointers = new Map();
@@ -277,13 +305,23 @@
     note.append(el("summary", null, noteText ? "Window note" : "Window note: no data"));
     if (noteText) note.append(el("p", null, noteText));
     stat.append(note);
+    var controls = el("div", "controls");
     var quality = el("button", "quality", "Glow: high");
     quality.type = "button";
     quality.id = "quality";
     quality.addEventListener("click", function () {
       applyQuality(state.quality === "low" ? "high" : "low");
     });
-    stat.append(quality);
+    var tour = el("button", "quality tour", "Tour: off");
+    tour.type = "button";
+    tour.id = "tour";
+    tour.setAttribute("aria-pressed", "false");
+    tour.title = "Play a slow lap: wide view, the working board, the executive office, then wide again. Off until you turn it on.";
+    tour.addEventListener("click", function () {
+      setTour(!state.tourOn);
+    });
+    controls.append(quality, tour);
+    stat.append(controls);
   }
 
   function renderWaiting(data, roster) {
@@ -309,7 +347,7 @@
       return;
     }
     roster.forEach(function (bot) {
-      var meta = "Last seen " + dash(bot.lastSeen) + " · Now " + dash(bot.now);
+      var meta = [bot.zoneLabel, "Last seen " + dash(bot.lastSeen), "Now " + dash(bot.now)].filter(Boolean).join(" · ");
       root.append(makeItem(bot.displayName, meta, bot.index, null, hslCss(bot.accent)));
     });
   }
@@ -461,6 +499,7 @@
     var bot = roster[state.selected];
     var root = detailShell(bot.displayName);
     var list = el("dl", "kv");
+    addDefinition(list, "Zone", bot.zoneLabel);
     addDefinition(list, "Last seen", bot.lastSeen);
     addDefinition(list, "Now", bot.now);
     addDefinition(list, "Id", bot.id);
@@ -610,6 +649,179 @@
     };
   }
 
+  function configuredMatch(botName, configuredName) {
+    var bot = fieldText(botName).toLowerCase();
+    var want = fieldText(configuredName).toLowerCase();
+    if (!bot || !want) return false;
+    if (bot === want) return true;
+    return bot.indexOf(want + "/") === 0;
+  }
+
+  function zoneForBot(bot) {
+    var exec = OFFICE.executive;
+    var execNames = exec && Array.isArray(exec.names) ? exec.names : [];
+    var i;
+    for (i = 0; i < execNames.length; i += 1) {
+      if (configuredMatch(bot.name, execNames[i])) {
+        return { id: "executive", spec: exec, executive: true, fallback: false };
+      }
+    }
+    var zones = Array.isArray(OFFICE.zones) ? OFFICE.zones : [];
+    var z;
+    for (z = 0; z < zones.length; z += 1) {
+      var list = zones[z] && Array.isArray(zones[z].names) ? zones[z].names : [];
+      for (i = 0; i < list.length; i += 1) {
+        if (configuredMatch(bot.name, list[i])) {
+          return {
+            id: fieldText(zones[z].id) || ("zone-" + z),
+            spec: zones[z],
+            executive: false,
+            fallback: false,
+          };
+        }
+      }
+    }
+    var fallback = OFFICE.defaultZone || { id: "unassigned", label: "UNASSIGNED", color: "#9eb4c4" };
+    return {
+      id: fieldText(fallback.id) || "unassigned",
+      spec: fallback,
+      executive: false,
+      fallback: true,
+    };
+  }
+
+  function measureZone(count, executive) {
+    if (count <= 0) return { cols: 0, rows: 0, gapX: 3.25, gapZ: 3.9, w: 7.4, d: 4.8 };
+    var cols = count <= 1 ? 1 : count <= 4 ? 2 : 3;
+    var rows = Math.ceil(count / cols);
+    var gapX = 3.25;
+    var gapZ = 3.9;
+    var w = Math.max((cols - 1) * gapX + 4.9, executive ? 8.6 : 6.8);
+    var d = Math.max((rows - 1) * gapZ + 5.4, executive ? 7.6 : 5.8);
+    return { cols: cols, rows: rows, gapX: gapX, gapZ: gapZ, w: w, d: d };
+  }
+
+  function layoutOffice(roster) {
+    var groups = [];
+
+    function ensure(id, spec, executive) {
+      var i;
+      for (i = 0; i < groups.length; i += 1) {
+        if (groups[i].id === id) return groups[i];
+      }
+      var group = {
+        id: id,
+        label: fieldText(spec && spec.label) || id,
+        color: fieldText(spec && spec.color) || "#8aa4b8",
+        role: fieldText(spec && spec.role),
+        executive: !!executive,
+        fallbackOnly: false,
+        bots: [],
+      };
+      groups.push(group);
+      return group;
+    }
+
+    if (OFFICE.executive) ensure("executive", OFFICE.executive, true);
+    var zoneSpecs = Array.isArray(OFFICE.zones) ? OFFICE.zones : [];
+    var s;
+    for (s = 0; s < zoneSpecs.length; s += 1) {
+      if (!zoneSpecs[s]) continue;
+      ensure(fieldText(zoneSpecs[s].id) || ("zone-" + s), zoneSpecs[s], false);
+    }
+
+    roster.forEach(function (bot) {
+      var placed = zoneForBot(bot);
+      var group = ensure(placed.id, placed.spec, placed.executive);
+      if (placed.fallback) group.fallbackOnly = true;
+      group.executive = placed.executive || group.executive;
+      if (placed.executive && fieldText(placed.spec && placed.spec.role)) group.role = fieldText(placed.spec.role);
+      group.bots.push(bot);
+      bot.zoneId = group.id;
+      bot.zoneLabel = group.label;
+      bot.executive = !!group.executive;
+      bot.plateRole = group.executive ? group.role : "";
+    });
+
+    groups = groups.filter(function (group) {
+      return group.fallbackOnly ? group.bots.length > 0 : true;
+    });
+
+    var gap = 1.25;
+    var rowGap = 1.45;
+    var maxRow = 40;
+    var bands = [];
+    var band = [];
+    var bandW = 0;
+    groups.forEach(function (group) {
+      var size = measureZone(group.bots.length, group.executive);
+      group.cols = size.cols;
+      group.rows = size.rows;
+      group.gapX = size.gapX;
+      group.gapZ = size.gapZ;
+      group.w = size.w;
+      group.d = size.d;
+      if (band.length && bandW + gap + group.w > maxRow) {
+        bands.push(band);
+        band = [];
+        bandW = 0;
+      }
+      band.push(group);
+      bandW += (band.length > 1 ? gap : 0) + group.w;
+    });
+    if (band.length) bands.push(band);
+
+    var margin = 2.7;
+    var totalD = 0;
+    var maxW = 0;
+    bands.forEach(function (row) {
+      var w = 0;
+      var d = 0;
+      row.forEach(function (group, index) {
+        w += group.w + (index ? gap : 0);
+        d = Math.max(d, group.d);
+      });
+      row.bandW = w;
+      row.bandD = d;
+      maxW = Math.max(maxW, w);
+      totalD += d;
+    });
+    totalD += rowGap * Math.max(0, bands.length - 1);
+    var width = Math.max(maxW + margin * 2, 12);
+    var depth = Math.max(totalD + margin * 2, 10);
+    var places = new Array(roster.length);
+    var zCursor = -depth / 2 + margin;
+    bands.forEach(function (row) {
+      var xCursor = -row.bandW / 2;
+      row.forEach(function (group) {
+        group.x = xCursor + group.w / 2;
+        group.z = zCursor + group.d / 2;
+        xCursor += group.w + gap;
+        group.bots.forEach(function (bot, index) {
+          var col = group.cols ? index % group.cols : 0;
+          var rowIndex = group.cols ? Math.floor(index / group.cols) : 0;
+          var rowCount = group.cols ? Math.min(group.cols, group.bots.length - rowIndex * group.cols) : 1;
+          var localX = (col - (rowCount - 1) / 2) * group.gapX;
+          var localZ = group.rows > 1 ? (rowIndex - (group.rows - 1) / 2) * group.gapZ : 0;
+          places[bot.index] = { x: group.x + localX, z: group.z + localZ, row: rowIndex, col: col };
+        });
+      });
+      zCursor += row.bandD + rowGap;
+    });
+
+    return {
+      places: places,
+      cols: 0,
+      rows: 0,
+      gapX: 3.25,
+      gapZ: 3.9,
+      width: width,
+      depth: depth,
+      zones: groups,
+      zoned: true,
+    };
+  }
+
   function mesh(geo, material, x, y, z) {
     var item = new THREE.Mesh(geo, material);
     item.position.set(x, y, z);
@@ -690,18 +902,31 @@
   }
 
   function drawLabel(bot) {
-    var canvas = makeCanvas(512, 112);
+    var role = fieldText(bot.plateRole);
+    var height = role ? 156 : 118;
+    var canvas = makeCanvas(512, height);
     var ctx = canvas.getContext("2d");
+    ctx.clearRect(0, 0, 512, height);
     ctx.fillStyle = "rgba(6, 12, 18, 0.9)";
-    fillRound(ctx, 8, 10, 496, 92, 24);
+    fillRound(ctx, 8, 8, 496, height - 16, 22);
     ctx.lineWidth = 5;
     ctx.strokeStyle = hslCss(bot.accent);
     ctx.stroke();
+    ctx.fillStyle = hslCss(bot.accent);
+    ctx.fillRect(8, 18, 8, height - 36);
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     ctx.fillStyle = "#f4fbff";
-    fitFont(ctx, bot.displayName, 460, 42, 20, "600");
-    ctx.fillText(ellipsize(ctx, bot.displayName, 460), 256, 56);
+    if (role) {
+      fitFont(ctx, bot.displayName, 440, 36, 18, "600");
+      ctx.fillText(ellipsize(ctx, bot.displayName, 440), 268, height * 0.38);
+      ctx.fillStyle = hslCss(bot.accent);
+      fitFont(ctx, role, 440, 22, 14, "600");
+      ctx.fillText(ellipsize(ctx, role, 440), 268, height * 0.68);
+    } else {
+      fitFont(ctx, bot.displayName, 440, 40, 18, "600");
+      ctx.fillText(ellipsize(ctx, bot.displayName, 440), 268, height / 2);
+    }
     return canvas;
   }
 
@@ -918,13 +1143,14 @@
   function addNeonFloor(parent, layout) {
     var y = 0.028;
     var edge = new THREE.MeshBasicMaterial({ color: 0x49f3ff });
-    var aisle = new THREE.MeshBasicMaterial({ color: 0x1ec8ea });
     var w = layout.width - 0.7;
     var d = layout.depth - 0.7;
     parent.add(mesh(new THREE.BoxGeometry(w, 0.02, 0.035), edge, 0, y, d / 2));
     parent.add(mesh(new THREE.BoxGeometry(w, 0.02, 0.035), edge, 0, y, -d / 2));
     parent.add(mesh(new THREE.BoxGeometry(0.035, 0.02, d), edge, w / 2, y, 0));
     parent.add(mesh(new THREE.BoxGeometry(0.035, 0.02, d), edge, -w / 2, y, 0));
+    if (layout.zoned) return;
+    var aisle = new THREE.MeshBasicMaterial({ color: 0x1ec8ea });
     parent.add(mesh(new THREE.BoxGeometry(0.03, 0.018, d * 0.86), aisle, 0, y, 0));
     var rows = layout.rows || 0;
     var gapZ = layout.gapZ || 4.55;
@@ -1382,16 +1608,18 @@
     var legR = makeLeg(1, shared, suit);
     hip.add(legL.hip, legR.hip);
 
-    var labelTex = canvasTexture(drawLabel(bot));
+    bot.labelCanvas = drawLabel(bot);
+    var labelTex = canvasTexture(bot.labelCanvas);
     var label = new THREE.Sprite(new THREE.SpriteMaterial({ map: labelTex, transparent: true, depthWrite: false }));
-    var labelW = clamp(1.15 + bot.displayName.length * 0.042, 1.25, 2.2);
-    label.scale.set(labelW, labelW * (112 / 512), 1);
+    var labelW = clamp(1.15 + bot.displayName.length * 0.042, 1.25, 2.35);
+    label.scale.set(labelW, labelW * (bot.labelCanvas.height / bot.labelCanvas.width), 1);
     label.position.set(0, 1.72, 0);
     actor.add(label);
 
     var bubble = null;
     if (bot.now) {
-      var bubbleTex = canvasTexture(drawBubble(bot));
+      bot.bubbleCanvas = drawBubble(bot);
+      var bubbleTex = canvasTexture(bot.bubbleCanvas);
       bubble = new THREE.Sprite(new THREE.SpriteMaterial({ map: bubbleTex, transparent: true, depthWrite: false }));
       var bubbleW = clamp(1.4 + bot.now.length * 0.012, 1.5, 2.25);
       bubble.scale.set(bubbleW, bubbleW * (300 / 768), 1);
@@ -1532,6 +1760,222 @@
     return canvasTexture(canvas);
   }
 
+  function hexColor(value, fallback) {
+    var text = fieldText(value);
+    if (/^#?[0-9a-fA-F]{6}$/.test(text)) return new THREE.Color(text.charAt(0) === "#" ? text : "#" + text);
+    return new THREE.Color(fallback);
+  }
+
+  function addZoneBorder(scene, zone, color) {
+    var mat = new THREE.MeshBasicMaterial({ color: color });
+    var y = 0.046;
+    var t = 0.05;
+    var hw = zone.w / 2;
+    var hd = zone.d / 2;
+    scene.add(mesh(new THREE.BoxGeometry(zone.w, 0.025, t), mat, zone.x, y, zone.z + hd));
+    scene.add(mesh(new THREE.BoxGeometry(zone.w, 0.025, t), mat, zone.x, y, zone.z - hd));
+    scene.add(mesh(new THREE.BoxGeometry(t, 0.025, zone.d), mat, zone.x + hw, y, zone.z));
+    scene.add(mesh(new THREE.BoxGeometry(t, 0.025, zone.d), mat, zone.x - hw, y, zone.z));
+  }
+
+  function addZoneFloorLabel(scene, zone, color) {
+    var canvas = makeCanvas(1024, 180);
+    var ctx = canvas.getContext("2d");
+    ctx.clearRect(0, 0, 1024, 180);
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.shadowColor = "rgba(255,255,255,0.35)";
+    ctx.shadowBlur = 8;
+    ctx.fillStyle = "#f7fbff";
+    var label = zone.label || "";
+    fitFont(ctx, label, 960, 86, 28, "700");
+    ctx.fillText(ellipsize(ctx, label, 960), 512, 90);
+    var tex = canvasTexture(canvas);
+    var planeW = Math.min(Math.max(zone.w * 0.84, 2.4), 8.4);
+    var planeH = planeW * (180 / 1024);
+    var labelMesh = mesh(
+      new THREE.PlaneGeometry(planeW, planeH),
+      new THREE.MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false }),
+      zone.x,
+      0.062,
+      zone.z + zone.d / 2 - planeH / 2 - 0.32
+    );
+    labelMesh.rotation.x = -Math.PI / 2;
+    labelMesh.renderOrder = 2;
+    scene.add(labelMesh);
+  }
+
+  function addExecutiveRoom(scene, zone, color) {
+    var h = 2.58;
+    var inset = 0.16;
+    var x0 = zone.x - zone.w / 2 + inset;
+    var x1 = zone.x + zone.w / 2 - inset;
+    var z0 = zone.z - zone.d / 2 + inset;
+    var z1 = zone.z + zone.d / 2 - inset;
+    var w = Math.max(x1 - x0, 0.4);
+    var d = Math.max(z1 - z0, 0.4);
+    var cx = (x0 + x1) / 2;
+    var cz = (z0 + z1) / 2;
+    var glass = new THREE.MeshStandardMaterial({
+      color: 0xffd6ea,
+      metalness: 0.08,
+      roughness: 0.04,
+      transparent: true,
+      opacity: 0.16,
+      emissive: color.clone(),
+      emissiveIntensity: 0.35,
+      depthWrite: false,
+      side: THREE.DoubleSide,
+    });
+    addGlassWall(scene, glass, w, h, cx, h / 2, z0, 0);
+    addGlassWall(scene, glass, d, h, x0, h / 2, cz, Math.PI / 2);
+    addGlassWall(scene, glass, d, h, x1, h / 2, cz, -Math.PI / 2);
+    var door = Math.min(1.7, w * 0.36);
+    var side = (w - door) / 2;
+    if (side > 0.25) {
+      addGlassWall(scene, glass, side, h, x0 + side / 2, h / 2, z1, Math.PI);
+      addGlassWall(scene, glass, side, h, x1 - side / 2, h / 2, z1, Math.PI);
+    }
+    var trim = new THREE.MeshBasicMaterial({ color: color });
+    scene.add(mesh(new THREE.BoxGeometry(door, 0.07, 0.06), trim, cx, h - 0.05, z1));
+    scene.add(mesh(new THREE.BoxGeometry(w, 0.045, 0.05), trim, cx, h, z0));
+    scene.add(mesh(new THREE.BoxGeometry(w, 0.045, 0.05), trim, cx, h, z1));
+    scene.add(mesh(new THREE.BoxGeometry(0.05, 0.045, d), trim, x0, h, cz));
+    scene.add(mesh(new THREE.BoxGeometry(0.05, 0.045, d), trim, x1, h, cz));
+    [[x0, z0], [x1, z0], [x0, z1], [x1, z1]].forEach(function (pair) {
+      scene.add(mesh(new THREE.BoxGeometry(0.07, h, 0.07), trim, pair[0], h / 2, pair[1]));
+    });
+    state.execAnchor = new THREE.Vector3(zone.x, 1.35, zone.z);
+    state.execTheta = 0.42;
+  }
+
+  function drawWorkingNow(ctx, canvas) {
+    var w = canvas.width;
+    var h = canvas.height;
+    ctx.clearRect(0, 0, w, h);
+    ctx.fillStyle = "#070b12";
+    ctx.fillRect(0, 0, w, h);
+    ctx.fillStyle = "#d5c6ff";
+    ctx.fillRect(36, 28, w - 72, 6);
+    var busy = [];
+    var i;
+    for (i = 0; i < roster.length; i += 1) {
+      if (roster[i].now) busy.push(roster[i]);
+    }
+    ctx.textBaseline = "alphabetic";
+    ctx.textAlign = "left";
+    ctx.font = "700 64px sans-serif";
+    ctx.fillStyle = "#d5c6ff";
+    var title = "WORKING NOW";
+    ctx.fillText(title, 48, 118);
+    ctx.fillStyle = "#f7fbff";
+    ctx.fillText(String(busy.length), 72 + ctx.measureText(title).width, 118);
+
+    var rowTop = 168;
+    var rowH = 76;
+    var maxRows = Math.max(1, Math.floor((h - rowTop - 36) / rowH));
+    var shown = busy.slice(0, maxRows);
+    var extra = busy.length - shown.length;
+    if (extra > 0 && shown.length === maxRows) {
+      shown = busy.slice(0, Math.max(0, maxRows - 1));
+      extra = busy.length - shown.length;
+    }
+    var nameLimit = Math.min(460, w * 0.34);
+    shown.forEach(function (bot, index) {
+      var y = rowTop + index * rowH;
+      var accent = hslCss(bot.accent);
+      ctx.fillStyle = accent;
+      ctx.beginPath();
+      ctx.arc(70, y + 18, 12, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.font = "700 40px sans-serif";
+      ctx.fillStyle = accent;
+      ctx.fillText(ellipsize(ctx, bot.displayName, nameLimit), 102, y + 32);
+      ctx.font = "400 36px sans-serif";
+      ctx.fillStyle = "#e7f2f8";
+      ctx.fillText(ellipsize(ctx, bot.now, w - nameLimit - 180), 120 + nameLimit, y + 32);
+    });
+    if (extra > 0) {
+      ctx.font = "400 32px sans-serif";
+      ctx.fillStyle = "#93a7b6";
+      ctx.fillText("and " + extra + " more", 102, rowTop + shown.length * rowH + 32);
+    }
+  }
+
+  function paintWorkingBoard() {
+    if (!state.workCtx || !state.workCanvas) return;
+    drawWorkingNow(state.workCtx, state.workCanvas);
+    if (state.workTex) state.workTex.needsUpdate = true;
+  }
+
+  function paintActivityWall() {
+    if (!state.activityCtx || !state.activityCanvas) return;
+    var next = drawWall(data, heat);
+    state.activityCtx.clearRect(0, 0, state.activityCanvas.width, state.activityCanvas.height);
+    state.activityCtx.drawImage(next, 0, 0);
+    if (state.activityTex) state.activityTex.needsUpdate = true;
+  }
+
+  function addWorkingBoard(scene, layout) {
+    var canvas = makeCanvas(1400, 760);
+    state.workCanvas = canvas;
+    state.workCtx = canvas.getContext("2d");
+    drawWorkingNow(state.workCtx, canvas);
+    var tex = canvasTexture(canvas);
+    state.workTex = tex;
+    var boardH = 2.35;
+    var boardW = boardH * (1400 / 760);
+    var x = -layout.width / 2 + 0.7;
+    var y = 2.15;
+    var z = 0;
+    var board = mesh(new THREE.PlaneGeometry(boardW, boardH), new THREE.MeshBasicMaterial({ map: tex }), x, y, z);
+    board.rotation.y = Math.PI / 2;
+    var frame = mesh(
+      new THREE.PlaneGeometry(boardW + 0.18, boardH + 0.18),
+      new THREE.MeshStandardMaterial({ color: 0x12141c, metalness: 0.4, roughness: 0.42, emissive: 0x24143a, emissiveIntensity: 0.55 }),
+      x - 0.05,
+      y,
+      z
+    );
+    frame.rotation.y = Math.PI / 2;
+    scene.add(frame, board);
+    var glow = new THREE.PointLight(0xd5c6ff, 1.1, 10, 2);
+    glow.position.set(x + 1.4, y, z);
+    scene.add(glow);
+    state.boardFocus = new THREE.Vector3(x + 0.2, y, z);
+    state.boardTheta = 1.2;
+  }
+
+  function addFloorZones(scene, layout) {
+    if (!layout || !layout.zones) return;
+    layout.zones.forEach(function (zone) {
+      var color = hexColor(zone.color, "#8aa4b8");
+      var carpetMat = new THREE.MeshStandardMaterial({
+        color: color.clone().multiplyScalar(0.16),
+        emissive: color.clone(),
+        emissiveIntensity: 0.14,
+        roughness: 0.94,
+        metalness: 0.04,
+        polygonOffset: true,
+        polygonOffsetFactor: -2,
+        polygonOffsetUnits: -2,
+      });
+      var carpet = mesh(
+        new THREE.PlaneGeometry(Math.max(zone.w - 0.16, 0.4), Math.max(zone.d - 0.16, 0.4)),
+        carpetMat,
+        zone.x,
+        0.02,
+        zone.z
+      );
+      carpet.rotation.x = -Math.PI / 2;
+      carpet.receiveShadow = false;
+      scene.add(carpet);
+      addZoneBorder(scene, zone, color);
+      addZoneFloorLabel(scene, zone, color);
+      if (zone.executive) addExecutiveRoom(scene, zone, color);
+    });
+  }
+
   function buildScene(data, roster, heat) {
     var canvas = document.getElementById("view");
     var renderer;
@@ -1551,24 +1995,33 @@
     scene.background = new THREE.Color(0x070b14);
     scene.fog = new THREE.FogExp2(0x12182c, 0.0048);
     state.scene = scene;
-    var layout = layoutFor(roster.length);
+    var layout = state.officeLayout || layoutFor(roster.length);
     state.layout = layout;
     var span = Math.max(layout.width, layout.depth);
     var camera = new THREE.PerspectiveCamera(42, 1, 0.08, 800);
     state.camera = camera;
-    var home = new THREE.Vector3(0, 2.35, 0);
+    var zoned = !!layout.zoned;
+    var theta0 = zoned ? 0.98 : 0.38;
+    var phi0 = zoned ? 1.06 : 1.38;
+    var radius0 = zoned ? Math.max(span * 0.5, 14) : Math.max(span * 0.98, 16);
+    var home = new THREE.Vector3(0, zoned ? 1.35 : 2.35, 0);
     state.view = {
-      theta: 0.38,
-      targetTheta: 0.38,
-      phi: 1.38,
-      targetPhi: 1.38,
-      radius: Math.max(span * 0.98, 16),
-      targetRadius: Math.max(span * 0.98, 16),
+      theta: theta0,
+      targetTheta: theta0,
+      phi: phi0,
+      targetPhi: phi0,
+      radius: radius0,
+      targetRadius: radius0,
+      span: span,
+      tourLook: null,
       minR: 3.3,
       maxR: Math.max(span * 3.6, 48),
       closeR: 5.5,
       look: home.clone(),
       home: home,
+      wideTheta: theta0,
+      widePhi: phi0,
+      wideRadius: radius0,
       lookAtBot: null,
       lookY: null,
       resumeAt: 0,
@@ -1591,12 +2044,18 @@
     var shared = buildShared();
     state.shadowTex = shadowTexture();
     addShell(scene, shared, layout);
+    if (layout.zoned) addFloorZones(scene, layout);
     roster.forEach(function (bot, index) {
-      scene.add(buildStation(bot, layout.places[index], shared));
+      var place = layout.places[index] || { x: 0, z: 0, row: 0, col: 0 };
+      scene.add(buildStation(bot, place, shared));
     });
+    if (layout.zoned) addWorkingBoard(scene, layout);
 
     var wallCanvas = drawWall(data, heat);
+    state.activityCanvas = wallCanvas;
+    state.activityCtx = wallCanvas.getContext("2d");
     var wallTex = canvasTexture(wallCanvas);
+    state.activityTex = wallTex;
     var screenW = Math.min(Math.max(layout.width * 0.46, 6.2), 8.2);
     var screenH = screenW * (520 / 1400);
     var wall = mesh(
@@ -1694,10 +2153,81 @@
     if (state.view) state.view.resumeAt = performance.now() + 8000;
   }
 
+  function paintTour() {
+    var button = document.getElementById("tour");
+    if (!button) return;
+    button.textContent = state.tourOn ? "Tour: on" : "Tour: off";
+    button.setAttribute("aria-pressed", state.tourOn ? "true" : "false");
+  }
+
+  function setTour(on) {
+    state.tourOn = !!on;
+    if (state.tourOn) state.tourTime = 0;
+    else if (state.view) state.view.tourLook = null;
+    paintTour();
+  }
+
+  function executiveLook() {
+    var i;
+    for (i = 0; i < roster.length; i += 1) {
+      if (roster[i].executive && roster[i].focus) return roster[i].focus.clone();
+    }
+    if (state.execAnchor) return state.execAnchor.clone();
+    return state.view && state.view.home ? state.view.home.clone() : new THREE.Vector3();
+  }
+
+  function tourStops() {
+    var view = state.view;
+    var wideLook = view.home.clone();
+    var wideRadius = view.wideRadius || Math.max((view.span || 18) * 0.5, 14);
+    var wideTheta = view.wideTheta != null ? view.wideTheta : 0.98;
+    var widePhi = view.widePhi != null ? view.widePhi : 1.06;
+    var boardLook = state.boardFocus ? state.boardFocus.clone() : wideLook.clone();
+    return [
+      { look: wideLook, theta: wideTheta, phi: widePhi, radius: wideRadius, dur: 6.2 },
+      { look: boardLook, theta: state.boardTheta || 1.2, phi: 1.22, radius: 9.2, dur: 6.4 },
+      { look: executiveLook(), theta: state.execTheta || 0.42, phi: 1.08, radius: 7.6, dur: 6.4 },
+      { look: wideLook, theta: wideTheta, phi: widePhi, radius: wideRadius, dur: 5.2 },
+    ];
+  }
+
+  function sampleTour(time) {
+    var stops = tourStops();
+    var total = 0;
+    var i;
+    for (i = 0; i < stops.length; i += 1) total += stops[i].dur;
+    var t = wrapPositive(time, total || 1);
+    for (i = 0; i < stops.length; i += 1) {
+      var dur = stops[i].dur;
+      if (t <= dur || i === stops.length - 1) {
+        var from = stops[i];
+        var to = stops[(i + 1) % stops.length];
+        var u = dur <= 0 ? 1 : Math.min(t / dur, 1);
+        var s = u * u * (3 - 2 * u);
+        return {
+          theta: from.theta + wrapAngle(to.theta - from.theta) * s,
+          phi: from.phi + (to.phi - from.phi) * s,
+          radius: from.radius + (to.radius - from.radius) * s,
+          look: from.look.clone().lerp(to.look, s),
+        };
+      }
+      t -= dur;
+    }
+    return { theta: 0.82, phi: 0.98, radius: 18, look: state.view.home.clone() };
+  }
+
   function updateCamera(dt) {
     var view = state.view;
-      if (!view || !state.camera) return;
-    if (!motionQuery.matches && state.selected < 0 && view.lookAtBot == null && performance.now() > view.resumeAt) {
+    if (!view || !state.camera) return;
+    var touring = state.tourOn && state.selected < 0 && performance.now() > view.resumeAt;
+    if (touring) {
+      state.tourTime += dt;
+      var sample = sampleTour(state.tourTime);
+      view.targetTheta = sample.theta;
+      view.targetPhi = clamp(sample.phi, 0.36, 1.48);
+      view.targetRadius = clamp(sample.radius, view.minR, view.maxR);
+      view.tourLook = sample.look;
+    } else if (!motionQuery.matches && !state.tourOn && state.selected < 0 && view.lookAtBot == null && performance.now() > view.resumeAt) {
       view.targetTheta += dt * 0.028;
     }
     var glide = 1 - Math.exp(-dt * 5.5);
@@ -1707,6 +2237,8 @@
     var desired = view.home;
     if (state.selected >= 0 && roster[state.selected] && roster[state.selected].focus) desired = roster[state.selected].focus;
     else if (view.lookAtBot != null && roster[view.lookAtBot] && roster[view.lookAtBot].focus) desired = roster[view.lookAtBot].focus;
+    else if (state.tourOn && view.tourLook && state.selected < 0) desired = view.tourLook;
+    else if (view.lookHold) desired = view.lookHold;
     if (view.lookY != null) {
       if (!state.aimLook) state.aimLook = new THREE.Vector3();
       state.aimLook.copy(desired);
@@ -2139,11 +2671,11 @@
     canvas.style.cursor = "pointer";
     var bot = roster[index];
     tip.hidden = false;
-    tip.replaceChildren(
-      el("strong", null, bot.displayName),
-      el("span", null, "Now " + dash(bot.now)),
-      el("span", null, "Last seen " + dash(bot.lastSeen))
-    );
+    var tipNodes = [el("strong", null, bot.displayName)];
+    if (bot.zoneLabel) tipNodes.push(el("span", null, bot.zoneLabel));
+    tipNodes.push(el("span", null, "Now " + dash(bot.now)));
+    tipNodes.push(el("span", null, "Last seen " + dash(bot.lastSeen)));
+    tip.replaceChildren.apply(tip, tipNodes);
     var width = tip.offsetWidth || 220;
     var height = tip.offsetHeight || 72;
     var left = x + 16;
@@ -2242,8 +2774,147 @@
     });
   }
 
+  function redrawNameplate(bot) {
+    if (!bot.labelCanvas) return;
+    var next = drawLabel(bot);
+    var ctx = bot.labelCanvas.getContext("2d");
+    ctx.clearRect(0, 0, bot.labelCanvas.width, bot.labelCanvas.height);
+    ctx.drawImage(next, 0, 0);
+    if (bot.label && bot.label.material && bot.label.material.map) bot.label.material.map.needsUpdate = true;
+  }
+
+  function syncBubble(bot) {
+    if (!bot.actor) return;
+    if (!bot.now) {
+      if (bot.bubble) bot.bubble.visible = false;
+      return;
+    }
+    if (!bot.bubble) {
+      bot.bubbleCanvas = drawBubble(bot);
+      var created = canvasTexture(bot.bubbleCanvas);
+      bot.bubble = new THREE.Sprite(new THREE.SpriteMaterial({ map: created, transparent: true, depthWrite: false }));
+      bot.actor.add(bot.bubble);
+    } else if (bot.bubbleCanvas) {
+      var next = drawBubble(bot);
+      var ctx = bot.bubbleCanvas.getContext("2d");
+      ctx.clearRect(0, 0, bot.bubbleCanvas.width, bot.bubbleCanvas.height);
+      ctx.drawImage(next, 0, 0);
+      if (bot.bubble.material && bot.bubble.material.map) bot.bubble.material.map.needsUpdate = true;
+      bot.bubble.visible = true;
+    }
+    var bubbleW = clamp(1.4 + bot.now.length * 0.012, 1.5, 2.25);
+    bot.bubble.scale.set(bubbleW, bubbleW * (300 / 768), 1);
+  }
+
+  function ensureWorkLight(bot) {
+    if (bot.behavior !== "type" || bot.light || !bot.actor || !bot.actor.parent) return;
+    var light = new THREE.PointLight(accentColor(bot), 0, 4.8, 2);
+    light.position.set(0, 1.25, -0.15);
+    bot.actor.parent.add(light);
+    bot.light = light;
+  }
+
+  function sameBots(next) {
+    var bots = next && Array.isArray(next.bots) ? next.bots : [];
+    if (bots.length !== roster.length) return false;
+    var i;
+    for (i = 0; i < bots.length; i += 1) {
+      var record = bots[i] && typeof bots[i] === "object" ? bots[i] : {};
+      if (fieldText(record.id) !== roster[i].id) return false;
+      if (fieldText(record.name) !== roster[i].name) return false;
+    }
+    return true;
+  }
+
+  function applyFresh(next) {
+    if (!next || typeof next !== "object" || Array.isArray(next)) return;
+    var packed;
+    try {
+      packed = JSON.stringify(next);
+    } catch (err) {
+      return;
+    }
+    if (packed === state.dataPacked) return;
+    if (!sameBots(next)) {
+      window.location.reload();
+      return;
+    }
+    state.dataPacked = packed;
+    data = next;
+    window.DATA = next;
+    var bots = Array.isArray(next.bots) ? next.bots : [];
+    roster.forEach(function (entry, index) {
+      var record = bots[index] && typeof bots[index] === "object" ? bots[index] : {};
+      entry.lastSeen = fieldText(record.lastSeen);
+      entry.now = fieldText(record.now);
+      entry.presence = presenceOf(record, next.generatedAt);
+      entry.behavior = behaviorFor(entry);
+      entry.waiting = Array.isArray(next.waiting) ? related(next.waiting, entry.id) : null;
+      entry.timeline = Array.isArray(next.timeline) ? related(next.timeline, entry.id) : null;
+      entry.routines = Array.isArray(next.routines) ? related(next.routines, entry.id) : null;
+      entry.observed = Array.isArray(next.observedRoutines) ? related(next.observedRoutines, entry.id) : null;
+      syncBubble(entry);
+      ensureWorkLight(entry);
+      redrawNameplate(entry);
+      if (entry.ctx) drawScreen(entry, state.animTime || 0);
+    });
+    heat = heatModel(next);
+    renderStat(data);
+    renderWaiting(data, roster);
+    renderFleet(data, roster);
+    renderHeat(heat);
+    renderTimeline(data, roster);
+    renderRoutines(data, roster);
+    renderDetail(roster);
+    applyQuality(state.quality);
+    paintTour();
+    paintWorkingBoard();
+    paintActivityWall();
+  }
+
+  function pullData() {
+    if (state.pulling || window.location.protocol === "file:") return Promise.resolve(false);
+    state.pulling = true;
+    return fetch("data.json", { cache: "no-store" })
+      .then(function (response) {
+        if (!response.ok) throw new Error(String(response.status));
+        return response.json();
+      })
+      .then(function (next) {
+        applyFresh(next);
+        return true;
+      })
+      .catch(function () {
+        return false;
+      })
+      .then(function (ok) {
+        state.pulling = false;
+        return ok;
+      });
+  }
+
+  function watchData() {
+    window.setInterval(function () { pullData(); }, 15000);
+    document.addEventListener("visibilitychange", function () {
+      if (!document.hidden) pullData();
+    });
+  }
+
   var data = loadData();
+  try {
+    state.dataPacked = data ? JSON.stringify(data) : "";
+  } catch (err) {
+    state.dataPacked = "";
+  }
   var roster = buildRoster(data);
+  state.officeLayout = null;
+  if (roster.length) {
+    try {
+      state.officeLayout = layoutOffice(roster);
+    } catch (err) {
+      console.error(err);
+    }
+  }
   var heat = heatModel(data);
 
   renderStat(data);
@@ -2253,7 +2924,7 @@
   renderTimeline(data, roster);
   renderRoutines(data, roster);
   renderTabs();
-  document.getElementById("hint").textContent = "Drag to orbit. The view drifts until you do. Scroll or pinch to zoom. Click a bot. A now-line sits and types under a holo bubble. The others bob, look around, or walk a short loop back to the desk. Glow follows last seen against the generated time: bright within 12 hours, dim within 48, dark after that.";
+  document.getElementById("hint").textContent = "Drag to orbit. The view drifts until you do. Scroll or pinch to zoom. Click a bot. Tour, in the header, stays off until you turn it on: wide, the working board, the executive office, then wide again. A now-line sits and types under a holo bubble. The others bob, look around, or walk a short loop. Glow follows last seen against the generated time: bright within 12 hours, dim within 48, dark after that. The working board reads data.json.";
 
   window.missionControl = {
     roster: roster,
@@ -2263,6 +2934,18 @@
     select: function (index) { selectIndex(index, "api"); },
     quality: function () { return state.quality; },
     setQuality: function (mode) { applyQuality(mode); },
+    tour: function () { return state.tourOn; },
+    setTour: function (on) { setTour(on); },
+    zones: function () {
+      return roster.map(function (bot) {
+        return { name: bot.name, zone: bot.zoneLabel || "", executive: !!bot.executive };
+      });
+    },
+    reloadData: function () { return pullData(); },
+    boardFocus: function () {
+      if (!state.boardFocus) return null;
+      return { x: state.boardFocus.x, y: state.boardFocus.y, z: state.boardFocus.z, theta: state.boardTheta || 0 };
+    },
     aim: function (partial) {
       if (!state.view || !partial) return;
       if (partial.theta != null) {
@@ -2284,8 +2967,14 @@
         state.holdTime = partial.hold ? partial.time : null;
       }
       if (partial.clear && !partial.hold) state.holdTime = null;
-      if (partial.lookIndex != null && partial.lookIndex >= 0) {
+      if (partial.lookAt && partial.lookAt.x != null) {
+        if (!state.view.lookHold) state.view.lookHold = new THREE.Vector3();
+        state.view.lookHold.set(partial.lookAt.x, partial.lookAt.y, partial.lookAt.z);
+        state.view.look.copy(state.view.lookHold);
+        state.view.lookAtBot = null;
+      } else if (partial.lookIndex != null && partial.lookIndex >= 0) {
         state.view.lookAtBot = partial.lookIndex;
+        state.view.lookHold = null;
         var framed = roster[partial.lookIndex];
         if (framed && framed.focus) {
           state.view.look.set(framed.focus.x, partial.lookY != null ? partial.lookY : framed.focus.y, framed.focus.z);
@@ -2294,6 +2983,7 @@
       } else if (partial.clear) {
         state.view.lookAtBot = null;
         state.view.lookY = null;
+        state.view.lookHold = null;
         state.view.look.copy(state.view.home);
       }
       if (partial.index != null) selectIndex(partial.index, "api");
@@ -2303,6 +2993,8 @@
   };
 
   state.quality = readQuality();
+  paintTour();
+  watchData();
 
   if (typeof THREE === "undefined") {
     showBanner("The 3D library did not load. The panels still show the data file.");
@@ -2316,5 +3008,6 @@
   } else {
     document.body.dataset.ready = "1";
     window.missionControl.ready = true;
+    applyQuality(state.quality);
   }
 })();
