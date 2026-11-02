@@ -1289,7 +1289,7 @@
   ],
   "you_rank": null,
   "scorecard": {
-    "updated": "2026-10-31",
+    "updated": "2026-11-02",
     "panels": [
       {
         "platform": "X",
@@ -1300,7 +1300,7 @@
           "following": 75,
           "posts": 220
         },
-        "targets_status": "Estimates (not yet approved)",
+        "targets_status": "Targets set by X Virality Score, 31 Oct",
         "targets": [
           [
             "Followers by 30 Nov",
@@ -1402,7 +1402,126 @@
           "source_label": "DataReportal Digital 2026: Laos"
         }
       }
-    ]
+    ],
+    "accounts": {
+      "@pswong661": {
+        "run_by": "X Virality Score",
+        "status": "behind",
+        "status_text": "Behind: needs about 33 more followers in 4 weeks to reach 50 by 30 Nov",
+        "latest": {
+          "week_ending": "2026-11-02",
+          "window": "26 Oct to 2 Nov 2026 (ICT)",
+          "followers": 17,
+          "followers_change": 2,
+          "posts_total": 237,
+          "posts_week": 17,
+          "originals": 9,
+          "replies": 8,
+          "media_originals": null,
+          "views": 199,
+          "original_views": 116,
+          "median_views_per_original": 10,
+          "engagements": 0,
+          "engagement_rate_pct": 0.0,
+          "link_clicks": null,
+          "profile_visits": null,
+          "bookmarks": 0,
+          "best": {
+            "text": "A habit our AI team gave AKEMI Laos: the date next to every number",
+            "views": 26,
+            "url": "https://x.com/pswong661/status/2116760659694407711"
+          },
+          "worst": {
+            "text": "Lao AI prompt post for shop owners",
+            "views": 8,
+            "url": "https://x.com/pswong661/status/2116501683236938093"
+          }
+        },
+        "fixes": [
+          "Move the shop and Facebook links into the first reply (Eric to decide)",
+          "Reply under bigger SEA accounts before the noon slot so new readers find the profile"
+        ],
+        "history": [
+          {
+            "week_ending": "2026-10-31",
+            "label": "31 Oct (baseline)",
+            "followers": 15,
+            "posts_total": 220
+          },
+          {
+            "week_ending": "2026-11-02",
+            "label": "2 Nov",
+            "followers": 17,
+            "posts_total": 237,
+            "views": 199,
+            "engagement_rate_pct": 0.0,
+            "originals": 9,
+            "replies": 8
+          }
+        ]
+      },
+      "@poh_sang62631": {
+        "run_by": "Voss",
+        "status": "behind",
+        "status_text": "Behind on followers, views and engagement; on track for cadence and media",
+        "latest": {
+          "week_ending": "2026-11-02",
+          "window": "26 Oct to 2 Nov 2026 (ICT)",
+          "followers": 6,
+          "followers_change": 0,
+          "posts_total": 99,
+          "posts_week": 26,
+          "originals": 8,
+          "quotes": 1,
+          "thread_followups": 4,
+          "replies": 13,
+          "media_originals": 3,
+          "views": 601,
+          "original_views": 341,
+          "median_views_per_original": 28,
+          "engagements": 11,
+          "engagement_rate_pct": 1.8,
+          "median_engagement_rate_per_original_pct": 0.0,
+          "link_clicks": null,
+          "indochina_link_posts": 1,
+          "profile_visits": null,
+          "bookmarks": 0,
+          "best": {
+            "text": "The SI Race is about to start (with image)",
+            "views": 99,
+            "url": "https://x.com/poh_sang62631/status/2116911541601866174"
+          },
+          "worst": {
+            "text": "AI is coming to Laos through the back...",
+            "views": 15,
+            "url": "https://x.com/poh_sang62631/status/2116385087206126026"
+          }
+        },
+        "fixes": [
+          "Media originals had a median of 87 views vs 20 for text-only: give most originals an image or clip",
+          "Add 2 more replies a week under SEA AI voices to reach 15"
+        ],
+        "history": [
+          {
+            "week_ending": "2026-10-31",
+            "label": "31 Oct (baseline)",
+            "followers": 6,
+            "posts_total": 90
+          },
+          {
+            "week_ending": "2026-11-02",
+            "label": "2 Nov",
+            "followers": 6,
+            "posts_total": 99,
+            "views": 601,
+            "engagement_rate_pct": 1.8,
+            "originals": 8,
+            "replies": 13,
+            "median_views_per_original": 28
+          }
+        ]
+      }
+    }
   },
   "indochina_ai": [
     {
