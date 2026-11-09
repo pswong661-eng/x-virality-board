@@ -955,10 +955,17 @@ async function boot(){
   renderNoHits(normalizeNoHits(d.no_hits));
   try{renderScorecard(d.scorecard)}catch(e){console.error(e)}
 }
+function scTrend(a){const h=(a&&a.history||[]).filter(x=>x.followers!==undefined);if(h.length<2)return'';
+  const T=a.target_followers||[];const t0=Date.parse(h[0].week_ending),pts=h.map(x=>[Date.parse(x.week_ending),x.followers]);
+  const tp=T.map(x=>[Date.parse(x.date),x.value!==undefined?x.value:x.low]);const tmax=Math.max(...tp.map(x=>x[0]),...pts.map(x=>x[0]));
+  const ymax=Math.max(...pts.map(x=>x[1]),...tp.map(x=>x[1]))*1.1||1;const W=300,H=90,P=6;
+  const X=t=>P+(t-t0)/(tmax-t0||1)*(W-2*P),Y=v=>H-P-(v/ymax)*(H-2*P);
+  const line=(arr,c,dash)=>`<polyline fill="none" stroke="${c}" stroke-width="2" ${dash?'stroke-dasharray="4 3"':''} points="${arr.map(x=>X(x[0]).toFixed(1)+','+Y(x[1]).toFixed(1)).join(' ')}"/>`;
+  return `<div class="sc-note">Follower trend vs target (solid = actual, dashed = target to ${esc(T.length?T[T.length-1].date:'')})</div><svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Follower trend vs target">${tp.length?line([[pts[0][0],pts[0][1]]].concat(tp),'#8a8f98',true):''}${line(pts,'var(--cyan)')}${pts.map(x=>`<circle cx="${X(x[0]).toFixed(1)}" cy="${Y(x[1]).toFixed(1)}" r="3" fill="var(--cyan)"/>`).join('')}</svg>`}
 function scWeek(a){if(!a||!a.latest)return'';const L=a.latest;const na=v=>v===null||v===undefined?'n/a':v;
   const rows=[['Followers',`${L.followers} (${L.followers_change>=0?'+':''}${L.followers_change})`],['Posts this week',`${L.posts_week}: ${L.originals} originals, ${L.replies} replies`],['Views',`${L.views} total · median ${L.median_views_per_original} per original`],['Engagement rate',`${L.engagement_rate_pct.toFixed(1)}%`],['Media originals',na(L.media_originals)],['Link clicks',na(L.link_clicks)],['Profile visits',na(L.profile_visits)],['Bookmarks',na(L.bookmarks)]];
   const h=(a.history||[]);
-  return `<div class="sc-status" style="color:var(--text)">Week to ${esc(L.week_ending)} · ${esc(a.status_text||'')}</div><div>${rows.map(r=>`<div class="sc-row"><span>${esc(r[0])}</span>${esc(r[1])}</div>`).join('')}</div><div class="sc-note">Best: <a href="${esc(L.best.url)}" target="_blank" rel="noopener">${esc(L.best.text)} (${L.best.views} views) ↗</a><br>Worst: <a href="${esc(L.worst.url)}" target="_blank" rel="noopener">${esc(L.worst.text)} (${L.worst.views} views) ↗</a></div>${(a.fixes||[]).length?`<div class="sc-note">Fixes: ${a.fixes.map(esc).join(' · ')}</div>`:''}<div class="sc-note">Weekly history: ${h.map(x=>`${esc(x.label)} ${x.followers} followers${x.views!==undefined?', '+x.views+' views':''}`).join(' → ')}</div>`}
+  return `<div class="sc-status" style="color:var(--text)">Week to ${esc(L.week_ending)} · ${esc(a.status_text||'')}</div><div>${rows.map(r=>`<div class="sc-row"><span>${esc(r[0])}</span>${esc(r[1])}</div>`).join('')}</div><div class="sc-note">Best: <a href="${esc(L.best.url)}" target="_blank" rel="noopener">${esc(L.best.text)} (${L.best.views} views) ↗</a><br>Worst: <a href="${esc(L.worst.url)}" target="_blank" rel="noopener">${esc(L.worst.text)} (${L.worst.views} views) ↗</a></div>${(a.fixes||[]).length?`<div class="sc-note">Fixes: ${a.fixes.map(esc).join(' · ')}</div>`:''}${scTrend(a)}<div class="sc-note">Weekly history: ${h.map(x=>`${esc(x.label)} ${x.followers} followers${x.views!==undefined?', '+x.views+' views':''}`).join(' → ')}</div>`}
 function renderScorecard(sc){
   const wrap=document.getElementById('scorecard-wrap');if(!wrap)return;
   const panels=sc&&Array.isArray(sc.panels)?sc.panels:[];if(!panels.length){wrap.hidden=true;return}
