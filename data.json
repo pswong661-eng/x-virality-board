@@ -965,7 +965,7 @@
   ],
   "you_rank": null,
   "scorecard": {
-    "updated": "2026-11-02",
+    "updated": "2026-11-16",
     "panels": [
       {
         "platform": "X",
@@ -1083,39 +1083,39 @@
       "@pswong661": {
         "run_by": "X Virality Score",
         "status": "behind",
-        "status_text": "Behind: needs about 33 more followers in 4 weeks to reach 50 by 30 Nov",
+        "status_text": "Behind: 20 followers (down 1), needs about 30 more in 2 weeks to reach 50 by 30 Nov",
         "latest": {
-          "week_ending": "2026-11-02",
-          "window": "26 Oct to 2 Nov 2026 (ICT)",
-          "followers": 17,
-          "followers_change": 2,
-          "posts_total": 237,
-          "posts_week": 17,
-          "originals": 9,
-          "replies": 8,
-          "media_originals": null,
-          "views": 199,
-          "original_views": 116,
-          "median_views_per_original": 10,
-          "engagements": 0,
-          "engagement_rate_pct": 0.0,
+          "week_ending": "2026-11-16",
+          "window": "9 Nov to 16 Nov 2026 (ICT)",
+          "followers": 20,
+          "followers_change": -1,
+          "posts_total": 363,
+          "posts_week": 63,
+          "originals": 16,
+          "replies": 46,
+          "media_originals": 1,
+          "views": 788,
+          "original_views": 599,
+          "median_views_per_original": 9,
+          "engagements": 18,
+          "engagement_rate_pct": 2.3,
           "link_clicks": null,
           "profile_visits": null,
           "bookmarks": 0,
           "best": {
-            "text": "A habit our AI team gave AKEMI Laos: the date next to every number",
-            "views": 26,
-            "url": "https://x.com/pswong661/status/2116760659694407711"
+            "text": "Outlook and Teams went quiet for a few hours (13 Nov)",
+            "views": 455,
+            "url": "https://x.com/pswong661/status/2121100108981043593"
           },
           "worst": {
-            "text": "Lao AI prompt post for shop owners",
-            "views": 8,
-            "url": "https://x.com/pswong661/status/2116501683236938093"
+            "text": "Lao AI tip for family business (14 Nov)",
+            "views": 4,
+            "url": "https://x.com/pswong661/status/2121576789663428701"
           }
         },
         "fixes": [
-          "Move the shop and Facebook links into the first reply (Eric to decide)",
-          "Reply under bigger SEA accounts before the noon slot so new readers find the profile"
+          "Only 1 of 16 originals had an image and the 1 image post got 8 views; the 455-view post was a timely news take, so mix in 2 to 3 news-reaction posts a week",
+          "Outbound replies got 71 views across 29 replies; reply within the first hour of big SEA accounts and drop low-reach replies"
         ],
         "history": [
           {
@@ -1133,49 +1133,83 @@
             "engagement_rate_pct": 0.0,
             "originals": 9,
             "replies": 8
+          },
+          {
+            "week_ending": "2026-11-09",
+            "label": "9 Nov",
+            "followers": 21,
+            "posts_total": 300,
+            "views": 533,
+            "engagement_rate_pct": 4.1,
+            "originals": 17,
+            "replies": 44
+          },
+          {
+            "week_ending": "2026-11-16",
+            "label": "16 Nov",
+            "followers": 20,
+            "posts_total": 363,
+            "views": 788,
+            "engagement_rate_pct": 2.3,
+            "originals": 16,
+            "replies": 46
+          }
+        ],
+        "target_followers": [
+          {
+            "date": "2026-11-30",
+            "value": 50
+          },
+          {
+            "date": "2027-01-31",
+            "value": 300
+          },
+          {
+            "date": "2027-04-30",
+            "value": 1000
           }
         ]
       },
       "@poh_sang62631": {
         "run_by": "Voss",
         "status": "behind",
-        "status_text": "Behind on followers, views and engagement; on track for cadence and media",
+        "status_text": "Behind on followers, median views, engagement and media; originals on target, replies short (6 vs 15)",
         "latest": {
-          "week_ending": "2026-11-02",
-          "window": "26 Oct to 2 Nov 2026 (ICT)",
-          "followers": 6,
-          "followers_change": 0,
-          "posts_total": 99,
-          "posts_week": 26,
+          "week_ending": "2026-11-16",
+          "window": "9 Nov to 16 Nov 2026 (ICT)",
+          "followers": 11,
+          "followers_change": 4,
+          "posts_total": 140,
+          "posts_week": 15,
           "originals": 8,
-          "quotes": 1,
-          "thread_followups": 4,
-          "replies": 13,
-          "media_originals": 3,
-          "views": 601,
-          "original_views": 341,
-          "median_views_per_original": 28,
-          "engagements": 11,
-          "engagement_rate_pct": 1.8,
+          "quotes": 0,
+          "reposts": 1,
+          "replies": 6,
+          "media_originals": 0,
+          "views": 3963,
+          "original_views": 3542,
+          "median_views_per_original": 31.5,
+          "engagements": 60,
+          "engagement_rate_pct": 1.5,
           "median_engagement_rate_per_original_pct": 0.0,
           "link_clicks": null,
-          "indochina_link_posts": 1,
+          "indochina_link_posts": null,
           "profile_visits": null,
-          "bookmarks": 0,
+          "bookmarks": 2,
           "best": {
-            "text": "The SI Race is about to start (with image)",
-            "views": 99,
-            "url": "https://x.com/poh_sang62631/status/2116911541601866174"
+            "text": "Stand with Jensen open-letter post (15 Nov)",
+            "views": 3149,
+            "url": "https://x.com/poh_sang62631/status/2121987540161106082"
           },
           "worst": {
-            "text": "AI is coming to Laos through the back...",
-            "views": 15,
-            "url": "https://x.com/poh_sang62631/status/2116385087206126026"
+            "text": "Best AI prompt in Laos isn't a question (13 Nov)",
+            "views": 19,
+            "url": "https://x.com/poh_sang62631/status/2121095810373026287"
           }
         },
         "fixes": [
-          "Media originals had a median of 87 views vs 20 for text-only: give most originals an image or clip",
-          "Add 2 more replies a week under SEA AI voices to reach 15"
+          "One post carries 3,149 of 3,542 original views; median is 31.5 vs the 100 target, so the repeatable engine is still missing: put an image on at least 3 originals and add the indochina.ai link to 2",
+          "Outbound replies fell to 6 vs target 15: do 2 to 3 replies a day under SEA AI voices"
         ],
         "history": [
           {
@@ -1194,6 +1228,42 @@
             "originals": 8,
             "replies": 13,
             "median_views_per_original": 28
+          },
+          {
+            "week_ending": "2026-11-09",
+            "label": "9 Nov",
+            "followers": 7,
+            "posts_total": 125,
+            "views": 3556,
+            "engagement_rate_pct": 1.0,
+            "originals": 8,
+            "replies": 13,
+            "median_views_per_original": 28
+          },
+          {
+            "week_ending": "2026-11-16",
+            "label": "16 Nov",
+            "followers": 11,
+            "posts_total": 140,
+            "views": 3963,
+            "engagement_rate_pct": 1.5,
+            "originals": 8,
+            "replies": 6,
+            "median_views_per_original": 31.5
+          }
+        ],
+        "target_followers": [
+          {
+            "date": "2026-11-30",
+            "value": 25
+          },
+          {
+            "date": "2026-12-31",
+            "value": 75
+          },
+          {
+            "date": "2027-03-31",
+            "value": 200
           }
         ]
       }
