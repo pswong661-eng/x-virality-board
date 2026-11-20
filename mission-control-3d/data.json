@@ -1,0 +1,689 @@
+{
+ "generatedAt": "2026-10-30T20:05:00+07:00",
+ "windowNote": "Partial refresh at 20:05 ICT Fri 30 Oct: other bots' transcripts could not be read from this run, so their last seen times and the heatmap are carried over from earlier builds. Al Capone, the waiting list (from Eric's 16:15 answers), the timeline and routine times are current. Viral News Finder was retired on 30 Oct and merged into X Virality Score.",
+ "bots": [
+  {
+   "id": "d637be57-438b-424f-b496-3098ae4cf313",
+   "name": "Al Capone",
+   "lastSeen": "2026-10-30 20:05",
+   "now": "Refreshing Mission Control"
+  },
+  {
+   "id": "1023d513-2c63-46f0-b6b1-d1e6e8c9f30e",
+   "name": "Voss",
+   "lastSeen": "2026-10-29 11:45",
+   "now": ""
+  },
+  {
+   "id": "109e6c78-7c63-4bad-8987-3dcd7add023b",
+   "name": "Proof",
+   "lastSeen": "2026-10-29 00:27",
+   "now": ""
+  },
+  {
+   "id": "11fa9d77-f8e0-4748-9cda-50559e09d043",
+   "name": "Kit",
+   "lastSeen": "2026-10-28 11:09",
+   "now": ""
+  },
+  {
+   "id": "2cf8398f-3274-484d-82f4-56ecc1a50724",
+   "name": "Sage",
+   "lastSeen": "2026-10-29 23:27",
+   "now": ""
+  },
+  {
+   "id": "4193ddb5-be86-4d97-a15a-108ddd4a97d6",
+   "name": "Deedkeeper",
+   "lastSeen": "2026-10-29 17:07",
+   "now": ""
+  },
+  {
+   "id": "43ef5026-3918-4e74-95e6-164a94889dca",
+   "name": "Viral News Finder (retired)",
+   "lastSeen": "2026-10-29 07:12",
+   "now": ""
+  },
+  {
+   "id": "4406b77d-be8c-4e56-95f9-7c4335124c5a",
+   "name": "Kham",
+   "lastSeen": "2026-10-28 08:52",
+   "now": ""
+  },
+  {
+   "id": "45d906f4-b8d7-4abc-b08e-04ad77afd7ca",
+   "name": "Anchor",
+   "lastSeen": "2026-10-29 00:32",
+   "now": ""
+  },
+  {
+   "id": "635b40c8-4f79-4730-98cb-9a56d99a2f95",
+   "name": "Forge",
+   "lastSeen": "2026-10-26 14:45",
+   "now": ""
+  },
+  {
+   "id": "a1f2809e-6237-4c27-b2cc-31285259c3eb",
+   "name": "X Virality Score",
+   "lastSeen": "2026-10-29 08:38",
+   "now": ""
+  },
+  {
+   "id": "af20e621-907d-4fbe-9fc2-f8496edd574a",
+   "name": "Answering Machina",
+   "lastSeen": "2026-10-21 23:01",
+   "now": ""
+  },
+  {
+   "id": "c25ef984-6f0e-4887-9aee-81a3f0abfe30",
+   "name": "Compass",
+   "lastSeen": "2026-10-28 22:09",
+   "now": ""
+  },
+  {
+   "id": "ccd20f57-7834-4164-8390-b4e30723895e",
+   "name": "Tally",
+   "lastSeen": "2026-10-30 15:25",
+   "now": ""
+  },
+  {
+   "id": "d48c85c5-da48-4c20-9d3d-a6763c02e591",
+   "name": "Reed/PannaiGrok",
+   "lastSeen": "2026-10-29 07:06",
+   "now": ""
+  },
+  {
+   "id": "e42e8f4d-11d5-4edb-a51c-b70bb78752d3",
+   "name": "Mattie",
+   "lastSeen": "2026-10-29 23:10",
+   "now": ""
+  },
+  {
+   "id": "f2246d28-814f-47f5-91a1-e8a6fd3a742d",
+   "name": "Rapid Response Desk",
+   "lastSeen": "2026-10-29 07:09",
+   "now": ""
+  },
+  {
+   "id": "f8c5f002-8ad7-4f4d-a37d-a11bb935353f",
+   "name": "Shelf",
+   "lastSeen": "2026-10-27 22:43",
+   "now": ""
+  }
+ ],
+ "heatmap": {
+  "days": [
+   "Fri 23",
+   "Sat 24",
+   "Sun 25",
+   "Mon 26",
+   "Tue 27",
+   "Wed 28",
+   "Thu 29"
+  ],
+  "values": [
+   [
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    4,
+    0,
+    0,
+    0,
+    0,
+    1,
+    4,
+    2,
+    10,
+    1,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0
+   ],
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    2,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0,
+    1,
+    2,
+    1
+   ],
+   [
+    0,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    2,
+    0,
+    2,
+    15,
+    0,
+    0,
+    7,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    4,
+    12
+   ],
+   [
+    3,
+    4,
+    0,
+    0,
+    1,
+    0,
+    0,
+    0,
+    3,
+    0,
+    0,
+    3,
+    0,
+    0,
+    0,
+    0,
+    0,
+    4,
+    0,
+    0,
+    0,
+    0,
+    6,
+    4
+   ],
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    2,
+    3,
+    0,
+    5,
+    3,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    3,
+    10,
+    1
+   ],
+   [
+    9,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    4,
+    2,
+    1,
+    1,
+    5,
+    0,
+    0,
+    0,
+    0,
+    0,
+    3,
+    0,
+    1,
+    0,
+    0,
+    1,
+    2
+   ]
+  ]
+ },
+ "waiting": [
+  {
+   "bot": "45d906f4-b8d7-4abc-b08e-04ad77afd7ca",
+   "at": "2026-10-29 08:16",
+   "text": "N&B payment and deposit terms in writing, pending N&B quote confirmation",
+   "source": "verified"
+  },
+  {
+   "bot": "45d906f4-b8d7-4abc-b08e-04ad77afd7ca",
+   "at": "2026-10-29 08:16",
+   "text": "N&B start date in writing, pending Eric's plan",
+   "source": "verified"
+  },
+  {
+   "bot": "f2246d28-814f-47f5-91a1-e8a6fd3a742d",
+   "at": "2026-10-29 07:07",
+   "text": "Pick a story number for an X post (remind Eric)",
+   "source": "verified"
+  },
+  {
+   "bot": "45d906f4-b8d7-4abc-b08e-04ad77afd7ca",
+   "at": "",
+   "text": "G0 and I7 overdue. Anchor to remind Eric in the daily morning meeting",
+   "source": "notes"
+  }
+ ],
+ "timeline": [
+  {
+   "bot": "d637be57-438b-424f-b496-3098ae4cf313",
+   "at": "2026-10-30 19:58",
+   "text": "Hourly mail check: nothing new, nothing from Stanley"
+  },
+  {
+   "bot": "d637be57-438b-424f-b496-3098ae4cf313",
+   "at": "2026-10-30 19:15",
+   "text": "Tailscale: CRM proxy failed again; restarted it and the CRM is back up"
+  },
+  {
+   "bot": "d637be57-438b-424f-b496-3098ae4cf313",
+   "at": "2026-10-30 19:02",
+   "text": "Hourly mail check: nothing new, nothing from Stanley"
+  },
+  {
+   "bot": "d637be57-438b-424f-b496-3098ae4cf313",
+   "at": "2026-10-30 18:27",
+   "text": "Villa voice-call check: no new call summaries"
+  },
+  {
+   "bot": "d637be57-438b-424f-b496-3098ae4cf313",
+   "at": "2026-10-30 18:18",
+   "text": "ericio back online; restarted Tailscale and the CRM is back up"
+  },
+  {
+   "bot": "d637be57-438b-424f-b496-3098ae4cf313",
+   "at": "2026-10-30 17:55",
+   "text": "Hourly mail check: nothing new, nothing from Stanley"
+  },
+  {
+   "bot": "d637be57-438b-424f-b496-3098ae4cf313",
+   "at": "2026-10-30 17:20",
+   "text": "ericio went offline and the CRM was unreachable; you were pinged"
+  },
+  {
+   "bot": "d637be57-438b-424f-b496-3098ae4cf313",
+   "at": "2026-10-30 17:00",
+   "text": "Hourly mail check: nothing new, nothing from Stanley"
+  },
+  {
+   "bot": "d637be57-438b-424f-b496-3098ae4cf313",
+   "at": "2026-10-30 16:45",
+   "text": "Friday fleet review done: 15 decision-log lines added, all bots kept"
+  },
+  {
+   "bot": "d637be57-438b-424f-b496-3098ae4cf313",
+   "at": "2026-10-30 16:30",
+   "text": "Viral News Finder retired and merged into X Virality Score"
+  },
+  {
+   "bot": "d637be57-438b-424f-b496-3098ae4cf313",
+   "at": "2026-10-30 16:22",
+   "text": "Hero pricing settled: heroes may sell at member and VIP prices"
+  },
+  {
+   "bot": "d637be57-438b-424f-b496-3098ae4cf313",
+   "at": "2026-10-30 16:15",
+   "text": "You cleared the waiting list; CR-008 done, mall approval given"
+  },
+  {
+   "bot": "d637be57-438b-424f-b496-3098ae4cf313",
+   "at": "2026-10-30 16:09",
+   "text": "Reseller ticket 5-3326 approved as a margin-floor exception"
+  },
+  {
+   "bot": "d637be57-438b-424f-b496-3098ae4cf313",
+   "at": "2026-10-30 16:05",
+   "text": "Hourly mail check: only the VIS newsletter, nothing from Stanley"
+  },
+  {
+   "bot": "ccd20f57-7834-4164-8390-b4e30723895e",
+   "at": "2026-10-30 15:25",
+   "text": "Sent inputs for the Friday review; N&B doc 115 held until CR-008"
+  },
+  {
+   "bot": "d637be57-438b-424f-b496-3098ae4cf313",
+   "at": "2026-10-30 15:19",
+   "text": "Tailscale dropped again; the watchdog restarted it and the CRM is back up"
+  },
+  {
+   "bot": "d637be57-438b-424f-b496-3098ae4cf313",
+   "at": "2026-10-30 15:05",
+   "text": "Mail check: Bugbot flagged 2 possible issues on the 3D office pull request"
+  },
+  {
+   "bot": "d637be57-438b-424f-b496-3098ae4cf313",
+   "at": "2026-10-30 12:55",
+   "text": "Mail check: Eadeco sent the CNY 2027 spreadsheet; VM order deadline is today"
+  },
+  {
+   "bot": "d637be57-438b-424f-b496-3098ae4cf313",
+   "at": "2026-10-30 12:03",
+   "text": "Hourly mail check: nothing new in any mailbox, nothing from Stanley"
+  },
+  {
+   "bot": "d637be57-438b-424f-b496-3098ae4cf313",
+   "at": "2026-10-30 11:19",
+   "text": "Tailscale dropped briefly; the watchdog restarted it and the CRM is back up"
+  },
+  {
+   "bot": "d637be57-438b-424f-b496-3098ae4cf313",
+   "at": "2026-10-30 10:13",
+   "text": "Trip.com: opened Villa Visoun 22 to 29 Oct 2028 at USD 300; one booking 12 to 13 Nov"
+  },
+  {
+   "bot": "d637be57-438b-424f-b496-3098ae4cf313",
+   "at": "2026-10-30 10:00",
+   "text": "Shop price sync: no price changes, nothing redeployed"
+  },
+  {
+   "bot": "2cf8398f-3274-484d-82f4-56ecc1a50724",
+   "at": "2026-10-29 23:27",
+   "text": "Ran the nightly reflection; noted your plan to spend more time guiding Ton"
+  },
+  {
+   "bot": "e42e8f4d-11d5-4edb-a51c-b70bb78752d3",
+   "at": "2026-10-29 19:37",
+   "text": "Published the approved Villa Visoun teak house post, no boost"
+  },
+  {
+   "bot": "4193ddb5-be86-4d97-a15a-108ddd4a97d6",
+   "at": "2026-10-29 17:04",
+   "text": "Sent condo cleaning and aircon rates near Elio Del Nest, Bangkok"
+  },
+  {
+   "bot": "1023d513-2c63-46f0-b6b1-d1e6e8c9f30e",
+   "at": "2026-10-29 11:45",
+   "text": "Posted X replies A and B (reply E went live at 11:42)"
+  },
+  {
+   "bot": "1023d513-2c63-46f0-b6b1-d1e6e8c9f30e",
+   "at": "2026-10-29 11:39",
+   "text": "Made both edits to the W44 LinkedIn post, scheduled Fri 30 Oct 09:00"
+  },
+  {
+   "bot": "e42e8f4d-11d5-4edb-a51c-b70bb78752d3",
+   "at": "2026-10-29 09:07",
+   "text": "Sent Day 8 of Grok Bot Community Laos (translation tips)"
+  },
+  {
+   "bot": "a1f2809e-6237-4c27-b2cc-31285259c3eb",
+   "at": "2026-10-29 08:38",
+   "text": "Sent the X virality digest to Voss and refreshed the dashboard"
+  },
+  {
+   "bot": "43ef5026-3918-4e74-95e6-164a94889dca",
+   "at": "2026-10-29 07:12",
+   "text": "Bot Directory scan: 11 new listings, 5 worth a look"
+  }
+ ],
+ "routines": [
+  {
+   "bot": "d637be57-438b-424f-b496-3098ae4cf313",
+   "name": "Friday fleet review",
+   "cron": "25 16 * * 5",
+   "next": "Fri 6 Nov 16:25"
+  },
+  {
+   "bot": "d637be57-438b-424f-b496-3098ae4cf313",
+   "name": "Tailscale check",
+   "cron": "hourly",
+   "next": "Fri 30 Oct 21:00"
+  },
+  {
+   "bot": "d637be57-438b-424f-b496-3098ae4cf313",
+   "name": "Hourly mail check",
+   "cron": "0 9-21 * * *",
+   "next": "Fri 30 Oct 21:00"
+  },
+  {
+   "bot": "d637be57-438b-424f-b496-3098ae4cf313",
+   "name": "Villa voice-call check",
+   "cron": "21 10,18 * * *",
+   "next": "Sat 31 Oct 10:21"
+  },
+  {
+   "bot": "d637be57-438b-424f-b496-3098ae4cf313",
+   "name": "Mission Control refresh",
+   "cron": "0 8,12,16,20 * * 1-5",
+   "next": "Mon 2 Nov 08:00"
+  },
+  {
+   "bot": "d637be57-438b-424f-b496-3098ae4cf313",
+   "name": "Minutes-saved log",
+   "cron": "30 20 * * 1-5",
+   "next": "Fri 30 Oct 20:30"
+  },
+  {
+   "bot": "d637be57-438b-424f-b496-3098ae4cf313",
+   "name": "Daily GM close",
+   "cron": "0 21 * * *",
+   "next": "Fri 30 Oct 21:00"
+  },
+  {
+   "bot": "d637be57-438b-424f-b496-3098ae4cf313",
+   "name": "Daily morning briefing",
+   "cron": "0 8 * * *",
+   "next": "Sat 31 Oct 08:00"
+  },
+  {
+   "bot": "d637be57-438b-424f-b496-3098ae4cf313",
+   "name": "Sitemap check",
+   "cron": "0 10 * * 6",
+   "next": "Sat 31 Oct 10:00"
+  },
+  {
+   "bot": "d637be57-438b-424f-b496-3098ae4cf313",
+   "name": "Review check",
+   "cron": "3 10 */3 * *",
+   "next": "Sat 31 Oct 10:03"
+  },
+  {
+   "bot": "d637be57-438b-424f-b496-3098ae4cf313",
+   "name": "Price Optimisation digest",
+   "cron": "42 9 2 * *",
+   "next": "Mon 2 Nov 09:42"
+  },
+  {
+   "bot": "d637be57-438b-424f-b496-3098ae4cf313",
+   "name": "Mattie delivery check",
+   "cron": "45 9 * * 1-5",
+   "next": "Mon 2 Nov 09:45"
+  },
+  {
+   "bot": "d637be57-438b-424f-b496-3098ae4cf313",
+   "name": "Akemi shop price sync",
+   "cron": "46 9 * * 1,3,5",
+   "next": "Mon 2 Nov 09:46"
+  },
+  {
+   "bot": "d637be57-438b-424f-b496-3098ae4cf313",
+   "name": "Villa Visoun Trip.com check",
+   "cron": "0 10 * * 1-5",
+   "next": "Mon 2 Nov 10:00"
+  },
+  {
+   "bot": "d637be57-438b-424f-b496-3098ae4cf313",
+   "name": "FB watch",
+   "cron": "0 11 * * 1,4",
+   "next": "Mon 2 Nov 11:00"
+  },
+  {
+   "bot": "d637be57-438b-424f-b496-3098ae4cf313",
+   "name": "Weekly opportunity hunt",
+   "cron": "4 9 * * 2",
+   "next": "Tue 3 Nov 09:04"
+  },
+  {
+   "bot": "d637be57-438b-424f-b496-3098ae4cf313",
+   "name": "CRM win-back list",
+   "cron": "40 9 * * 3",
+   "next": "Wed 4 Nov 09:40"
+  },
+  {
+   "bot": "d637be57-438b-424f-b496-3098ae4cf313",
+   "name": "Meta token reminder",
+   "cron": "once",
+   "next": "Fri 18 Dec 09:02"
+  },
+  {
+   "bot": "d637be57-438b-424f-b496-3098ae4cf313",
+   "name": "Gigi bridge (webhook)",
+   "cron": "on webhook",
+   "next": "When Gigi sends"
+  }
+ ],
+ "observedRoutines": [
+  {
+   "bot": "d48c85c5-da48-4c20-9d3d-a6763c02e591",
+   "name": "Weekday setup brief",
+   "seen": "about 07:06 weekdays"
+  },
+  {
+   "bot": "f2246d28-814f-47f5-91a1-e8a6fd3a742d",
+   "name": "Weekday story picks for X",
+   "seen": "about 07:07 weekdays"
+  },
+  {
+   "bot": "43ef5026-3918-4e74-95e6-164a94889dca",
+   "name": "Bot Directory Scout (bot retired 30 Oct)",
+   "seen": "about 07:12 (26 and 29 Oct)"
+  },
+  {
+   "bot": "2cf8398f-3274-484d-82f4-56ecc1a50724",
+   "name": "Daily wisdom coach",
+   "seen": "about 08:17 daily"
+  },
+  {
+   "bot": "a1f2809e-6237-4c27-b2cc-31285259c3eb",
+   "name": "Daily X virality digest",
+   "seen": "about 08:30 daily"
+  },
+  {
+   "bot": "4406b77d-be8c-4e56-95f9-7c4335124c5a",
+   "name": "Daily Follow-up List",
+   "seen": "about 08:52"
+  },
+  {
+   "bot": "e42e8f4d-11d5-4edb-a51c-b70bb78752d3",
+   "name": "Community Laos daily post",
+   "seen": "about 09:07"
+  },
+  {
+   "bot": "d48c85c5-da48-4c20-9d3d-a6763c02e591",
+   "name": "Stanley docs watch",
+   "seen": "10:00 and 16:00, ends Fri 30 Oct"
+  },
+  {
+   "bot": "e42e8f4d-11d5-4edb-a51c-b70bb78752d3",
+   "name": "Villa weekly approved post",
+   "seen": "about 19:37 Thu"
+  },
+  {
+   "bot": "2cf8398f-3274-484d-82f4-56ecc1a50724",
+   "name": "Nightly reflection",
+   "seen": "about 22:35 daily"
+  },
+  {
+   "bot": "f8c5f002-8ad7-4f4d-a37d-a11bb935353f",
+   "name": "Nightly idea sweep",
+   "seen": "about 22:37 daily"
+  },
+  {
+   "bot": "f8c5f002-8ad7-4f4d-a37d-a11bb935353f",
+   "name": "Weekly idea pick",
+   "seen": "Sun about 19:27"
+  },
+  {
+   "bot": "ccd20f57-7834-4164-8390-b4e30723895e",
+   "name": "Weekly finance check",
+   "seen": "Fridays"
+  },
+  {
+   "bot": "af20e621-907d-4fbe-9fc2-f8496edd574a",
+   "name": "Villa Visoun availability sync",
+   "seen": "morning and evening"
+  },
+  {
+   "bot": "e42e8f4d-11d5-4edb-a51c-b70bb78752d3",
+   "name": "Calendar Draft Check, Page + Competitor Watch",
+   "seen": "time not shown"
+  }
+ ],
+ "routinesNotVisible": [
+  "Voss",
+  "Proof",
+  "Kit",
+  "Deedkeeper",
+  "Anchor (routines paused)",
+  "Forge",
+  "Compass"
+ ]
+}
