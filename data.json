@@ -2,7 +2,7 @@
   "title": "Daily X narrative digest",
   "date": "2026-11-23",
   "timezone": "Asia/Vientiane",
-  "updated": "2026-11-23T08:27:00+07:00",
+  "updated": "2026-11-23T09:35:00+07:00",
   "brand_title": "Eric's X Virality Score",
   "brand_handle": "@poh_sang62631",
   "hits": [
@@ -1088,7 +1088,7 @@
   ],
   "you_rank": null,
   "scorecard": {
-    "updated": "2026-11-16",
+    "updated": "2026-11-23",
     "panels": [
       {
         "platform": "X",
@@ -1206,39 +1206,40 @@
       "@pswong661": {
         "run_by": "X Virality Score",
         "status": "behind",
-        "status_text": "Behind: 20 followers (down 1), needs about 30 more in 2 weeks to reach 50 by 30 Nov",
+        "status_text": "Behind: 19 followers (down 1 more), needs about 31 more in 7 days to reach 50 by 30 Nov",
         "latest": {
-          "week_ending": "2026-11-16",
-          "window": "9 Nov to 16 Nov 2026 (ICT)",
-          "followers": 20,
+          "week_ending": "2026-11-23",
+          "window": "16 Nov to 23 Nov 2026 (ICT)",
+          "followers": 19,
           "followers_change": -1,
-          "posts_total": 363,
-          "posts_week": 63,
-          "originals": 16,
-          "replies": 46,
-          "media_originals": 1,
-          "views": 788,
-          "original_views": 599,
-          "median_views_per_original": 9,
-          "engagements": 18,
-          "engagement_rate_pct": 2.3,
+          "posts_total": 390,
+          "posts_week": 27,
+          "originals": 12,
+          "replies": 15,
+          "outbound_replies": 9,
+          "media_originals": 0,
+          "views": 731,
+          "original_views": 144,
+          "median_views_per_original": 12.5,
+          "engagements": 9,
+          "engagement_rate_pct": 1.2,
           "link_clicks": null,
           "profile_visits": null,
           "bookmarks": 0,
           "best": {
-            "text": "Outlook and Teams went quiet for a few hours (13 Nov)",
-            "views": 455,
-            "url": "https://x.com/pswong661/status/2121100108981043593"
+            "text": "Lao AI how-to for small shops: 3-line end-of-day note (18 Nov)",
+            "views": 19,
+            "url": "https://x.com/pswong661/status/2123025751029243971"
           },
           "worst": {
-            "text": "Lao AI tip for family business (14 Nov)",
-            "views": 4,
-            "url": "https://x.com/pswong661/status/2121576789663428701"
+            "text": "Lao AI how-to for small teams: record shop-opening walk-through (22 Nov)",
+            "views": 3,
+            "url": "https://x.com/pswong661/status/2124475980064620571"
           }
         },
         "fixes": [
-          "Only 1 of 16 originals had an image and the 1 image post got 8 views; the 455-view post was a timely news take, so mix in 2 to 3 news-reaction posts a week",
-          "Outbound replies got 71 views across 29 replies; reply within the first hour of big SEA accounts and drop low-reach replies"
+          "All 12 originals are scheduled how-tos with no image and 144 views in total (median 12.5); the only reach came from a reply to @straits_times (483 views), so reply to big SEA accounts within the hour and add a news-reaction post",
+          "Followers are flat at 19 (target 50-150 by 30 Nov): test one image on the daily how-to and pin a single best post"
         ],
         "history": [
           {
@@ -1276,6 +1277,16 @@
             "engagement_rate_pct": 2.3,
             "originals": 16,
             "replies": 46
+          },
+          {
+            "week_ending": "2026-11-23",
+            "label": "23 Nov",
+            "followers": 19,
+            "posts_total": 390,
+            "views": 731,
+            "engagement_rate_pct": 1.2,
+            "originals": 12,
+            "replies": 15
           }
         ],
         "target_followers": [
@@ -1296,43 +1307,44 @@
       "@poh_sang62631": {
         "run_by": "Voss",
         "status": "behind",
-        "status_text": "Behind on followers, median views, engagement and media; originals on target, replies short (6 vs 15)",
+        "status_text": "Behind on followers (13 vs 25 by 30 Nov), median views, engagement, media and replies",
         "latest": {
-          "week_ending": "2026-11-16",
-          "window": "9 Nov to 16 Nov 2026 (ICT)",
-          "followers": 11,
-          "followers_change": 4,
-          "posts_total": 140,
+          "week_ending": "2026-11-23",
+          "window": "16 Nov to 23 Nov 2026 (ICT)",
+          "followers": 13,
+          "followers_change": 2,
+          "posts_total": 155,
           "posts_week": 15,
-          "originals": 8,
-          "quotes": 0,
-          "reposts": 1,
-          "replies": 6,
+          "originals": 6,
+          "quotes": 1,
+          "reposts": 0,
+          "replies": 8,
+          "outbound_replies": 7,
           "media_originals": 0,
-          "views": 3963,
-          "original_views": 3542,
-          "median_views_per_original": 31.5,
-          "engagements": 60,
-          "engagement_rate_pct": 1.5,
-          "median_engagement_rate_per_original_pct": 0.0,
+          "views": 714,
+          "original_views": 237,
+          "median_views_per_original": 35,
+          "engagements": 13,
+          "engagement_rate_pct": 1.8,
+          "median_engagement_rate_per_original_pct": null,
           "link_clicks": null,
-          "indochina_link_posts": null,
+          "indochina_link_posts": 0,
           "profile_visits": null,
-          "bookmarks": 2,
+          "bookmarks": 0,
           "best": {
-            "text": "Stand with Jensen open-letter post (15 Nov)",
-            "views": 3149,
-            "url": "https://x.com/poh_sang62631/status/2121987540161106082"
+            "text": "Meeting a partner from another culture next week? Hermes Agent (19 Nov)",
+            "views": 82,
+            "url": "https://x.com/poh_sang62631/status/2123459332016836859"
           },
           "worst": {
-            "text": "Best AI prompt in Laos isn't a question (13 Nov)",
-            "views": 19,
-            "url": "https://x.com/poh_sang62631/status/2121095810373026287"
+            "text": "Sabaidee, AI saves your team an hour (21 Nov)",
+            "views": 15,
+            "url": "https://x.com/poh_sang62631/status/2123973891664285722"
           }
         },
         "fixes": [
-          "One post carries 3,149 of 3,542 original views; median is 31.5 vs the 100 target, so the repeatable engine is still missing: put an image on at least 3 originals and add the indochina.ai link to 2",
-          "Outbound replies fell to 6 vs target 15: do 2 to 3 replies a day under SEA AI voices"
+          "6 originals clear the 5 a week target but none carried media (target 1 in 3) and none had the indochina.ai link: put an image on 2 and the link on 2",
+          "Replies to SEA AI voices were 7 plus 1 quote vs target 15: do 2 replies a day; median views per original is 35 vs 100 by 30 Nov"
         ],
         "history": [
           {
@@ -1373,6 +1385,17 @@
             "originals": 8,
             "replies": 6,
             "median_views_per_original": 31.5
+          },
+          {
+            "week_ending": "2026-11-23",
+            "label": "23 Nov",
+            "followers": 13,
+            "posts_total": 155,
+            "views": 714,
+            "engagement_rate_pct": 1.8,
+            "originals": 6,
+            "replies": 8,
+            "median_views_per_original": 35
           }
         ],
         "target_followers": [
